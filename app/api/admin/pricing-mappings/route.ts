@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMysql } from '@/lib/mysql';
+import { authorize } from '@/lib/authMiddleware';
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = await authorize(req, 'manage_pricing');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
     const mysqlClient = getMysql();
     if (!mysqlClient) {
       return NextResponse.json({ success: true, mappings: [] });

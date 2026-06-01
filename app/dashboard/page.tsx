@@ -593,7 +593,7 @@ export default function Dashboard() {
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-sans text-on-surface-variant/80 font-bold">Trust Transfer Key:</span>
-                                <span className="font-bold">curator@pristineeditorial.com</span>
+                                <span className="font-bold">admin@gmail.com</span>
                               </div>
                               <div className="flex justify-between border-t border-outline-variant/10 pt-2 font-bold text-secondary">
                                 <span className="font-sans">Exact Invoice Total:</span>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDbAsync, saveDb, triggerEmail, Ticket, TicketReply } from '@/lib/db';
+import { checkPermission } from '@/lib/authMiddleware';
 
 export async function GET(req: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
     }
 
-    const user = db.users.find(u => u.id === userIdCookie);
+    const user = db.users.find(u => String(u.id) === userIdCookie);
     if (!user) {
       return NextResponse.json({ error: 'User account not found.' }, { status: 401 });
     }
@@ -31,7 +32,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ticket, replies });
     }
 
-    if (user.is_admin) {
+    const canViewAll = user.is_admin || (user.role_id ? await checkPermission(user.role_id, 'manage_tickets') : false);
+    if (canViewAll) {
       const enrichedTickets = db.tickets.map(t => {
         const owner = db.users.find(u => u.id === t.user_id);
         const customer_name = owner ? owner.name : 'Valued Client';
@@ -76,7 +78,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
     }
 
-    const user = db.users.find(u => u.id === userIdCookie);
+    const user = db.users.find(u => String(u.id) === userIdCookie);
     if (!user) {
       return NextResponse.json({ error: 'User account not found.' }, { status: 401 });
     }
@@ -97,17 +99,18 @@ export async function POST(req: NextRequest) {
       }
 
       // Check access permission
-      if (!user.is_admin && ticket.user_id !== user.id) {
+      const isSupportReply = user.is_admin || (user.role_id ? await checkPermission(user.role_id, 'manage_tickets') : false);
+      if (!isSupportReply && ticket.user_id !== user.id) {
         return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
       }
 
-      const senderType = user.is_admin ? 'admin' : 'user';
+      const senderType = isSupportReply ? 'admin' : 'user';
 
       const newReply: TicketReply = {
         id: `rep-${Math.floor(100000 + Math.random() * 900000)}`,
         ticket_id: ticketId,
         sender_type: senderType,
-        sender_id: user.id,
+        sender_id: String(user.id),
         message,
         attachment: attachment || '',
         created_at: new Date().toISOString()
@@ -116,7 +119,7 @@ export async function POST(req: NextRequest) {
       db.ticketReplies.push(newReply);
 
       // Adjust ticket status
-      if (user.is_admin) {
+      if (isSupportReply) {
         ticket.status = 'Waiting for Customer';
       } else {
         ticket.status = 'Open';
@@ -126,7 +129,7 @@ export async function POST(req: NextRequest) {
       saveDb(db);
 
       // Trigger Email Events
-      if (user.is_admin) {
+      if (isSupportReply) {
         // Find owner of ticket to notify
         const ticketOwner = db.users.find(u => u.id === ticket.user_id);
         if (ticketOwner) {
@@ -137,7 +140,7 @@ export async function POST(req: NextRequest) {
         }
       } else {
         // Notify admin
-        triggerEmail('tpl-ticket-replied', 'curator@pristineeditorial.com', {
+        triggerEmail('tpl-ticket-replied', 'admin@gmail.com', {
           customer_name: `ADMIN [Reply from ${user.name}]`,
           ticket_id: ticket.ticket_number
         });
@@ -148,7 +151,8 @@ export async function POST(req: NextRequest) {
 
     // B. UPDATE TICKET STATUS (Admin Only)
     if (action === 'status') {
-      if (!user.is_admin) {
+      const isSupport = user.is_admin || (user.role_id ? await checkPermission(user.role_id, 'manage_tickets') : false);
+      if (!isSupport) {
         return NextResponse.json({ error: 'Forbidden administrative operations.' }, { status: 403 });
       }
 
@@ -221,7 +225,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Notify Admin
-    triggerEmail('tpl-ticket-created', 'curator@pristineeditorial.com', {
+    triggerEmail('tpl-ticket-created', 'admin@gmail.com', {
       customer_name: `ADMIN [New Ticket - ${user.name}]`,
       ticket_id: newTicket.ticket_number,
       status: 'PENDING CLIENT ASSIGNMENTS'

@@ -1,205 +1,164 @@
 {
   "users": [
     {
-      "id": "usr-685426",
-      "name": "badhan",
-      "email": "www.badhan0068@gmail.com",
-      "phone": "85656325635",
-      "password_hash": "123456",
-      "account_source": "signup",
-      "email_verified_at": "2026-05-27T04:38:05.000Z",
-      "is_admin": 0,
-      "created_at": "2026-05-27T04:38:05.000Z",
-      "updated_at": "2026-05-27T04:38:05.000Z"
-    },
-    {
-      "id": "usr-admin",
+      "id": 1,
       "name": "Pristine Atelier Admin",
-      "email": "curator@pristineeditorial.com",
+      "email": "admin@gmail.com",
       "phone": "+1 (416) 555-0100",
-      "password_hash": "admin",
+      "password_hash": "$2b$10$uMR2Js.0TDTFDoJgDBmGKOwtJN5uy6apahpgVguo8bF/WfBP2.RCq",
+      "role_id": 1,
       "account_source": "signup",
-      "email_verified_at": "2026-05-24T18:09:20.000Z",
-      "is_admin": 1,
-      "created_at": "2026-05-24T18:09:20.000Z",
-      "updated_at": "2026-05-24T18:09:20.000Z"
+      "email_verified_at": "2026-05-20T09:39:20.000Z",
+      "is_active": 1,
+      "is_admin": true,
+      "created_at": "2026-05-20T09:39:20.000Z",
+      "updated_at": "2026-05-20T09:39:20.000Z"
     },
     {
-      "id": "usr-user1",
+      "id": 101,
+      "name": "SUMIT Pendelton",
+      "email": "sumit@pristine.com",
+      "phone": "9876543210",
+      "password_hash": "$2b$10$RucF42j3vtCvBuLScfSo7udIlrERaksxwcBG1j.OqN0nr0bzNrZ9u",
+      "role_id": 1,
+      "account_source": "signup",
+      "email_verified_at": "2026-05-28T15:31:41.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-26T18:56:38.000Z",
+      "updated_at": "2026-05-28T23:14:44.000Z"
+    },
+    {
+      "id": 102,
+      "name": "Jessica Vance",
+      "email": "jessica@pristine.com",
+      "phone": "+1 (416) 555-0102",
+      "password_hash": "$2b$10$wrlNPTFbJgj8yu4haWw7QujVWUcV4VsNUD6.Ty70O.wQLjQF43aAq",
+      "role_id": 4,
+      "account_source": "signup",
+      "email_verified_at": "2026-05-28T15:31:41.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-26T18:56:38.000Z",
+      "updated_at": "2026-05-28T14:33:03.000Z"
+    },
+    {
+      "id": 103,
+      "name": "Michael Chen",
+      "email": "michael@pristine.com",
+      "phone": "+1 (416) 555-0103",
+      "password_hash": "$2b$10$gueOvzLe8oVwBaNPrg3hP.Zfiq2Sfl9d20AUHo6HJQD6h2oiVwVq2",
+      "role_id": 2,
+      "account_source": "signup",
+      "email_verified_at": "2026-05-28T15:31:41.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-26T18:56:38.000Z",
+      "updated_at": "2026-05-28T15:17:03.000Z"
+    },
+    {
+      "id": 201,
       "name": "Jean-Paul Leclerc",
       "email": "j.leclerc@gmail.com",
       "phone": "+1 (416) 555-0149",
       "password_hash": "user123",
+      "role_id": null,
       "account_source": "signup",
-      "email_verified_at": "2026-05-24T18:09:20.000Z",
-      "is_admin": 0,
-      "created_at": "2026-05-24T18:09:20.000Z",
-      "updated_at": "2026-05-24T18:09:20.000Z"
+      "email_verified_at": "2026-05-20T09:39:20.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-20T09:39:20.000Z",
+      "updated_at": "2026-05-20T09:39:20.000Z"
+    },
+    {
+      "id": 301,
+      "name": "TEST STUFF SUMIT",
+      "email": "s@g.com",
+      "phone": "+1 (416) 555-4821",
+      "password_hash": "$2b$10$r7wFCZI1GhOjtffok9wXduonE91gI58yBQJJTKWrrzpeVW7T7y3Fy",
+      "role_id": 4,
+      "account_source": "signup",
+      "email_verified_at": "2026-05-28T15:31:41.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-26T19:09:31.000Z",
+      "updated_at": "2026-05-30T21:57:35.000Z"
+    },
+    {
+      "id": 302,
+      "name": "badhan",
+      "email": "www.badhan0068@gmail.com",
+      "phone": "85656325635",
+      "password_hash": "123456",
+      "role_id": null,
+      "account_source": "signup",
+      "email_verified_at": "2026-05-22T20:08:05.000Z",
+      "is_active": 1,
+      "is_admin": false,
+      "created_at": "2026-05-22T20:08:05.000Z",
+      "updated_at": "2026-05-22T20:08:05.000Z"
     }
   ],
   "services": [
     {
-      "id": "srv-559191",
-      "title": "test sumit service",
-      "slug": "test-sumit-service",
-      "description": "hiii sumitt",
-      "image": "https://images.unsplash.com/photo-1777900057023-e1fae8e9e3b1?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8",
-      "base_price": 1500,
-      "is_active": 1,
-      "is_manual_quote": 0,
-      "included_items": [
-        "t1",
-        "nooo dartt"
-      ],
-      "excluded_items": [
-        "yeasjjjj"
-      ],
-      "is_featured": 0,
-      "is_instant_pricing_enabled": 1,
-      "display_order": 0,
-      "full_description": null,
-      "faqs": null,
-      "notes": null,
-      "created_at": "2026-05-29T18:57:20.000Z",
-      "updated_at": "2026-05-29T18:57:20.000Z"
-    },
-    {
-      "id": "srv-641038",
-      "title": "Espanola Service",
-      "slug": "espanola-service",
-      "description": "We provide most A+ Service",
-      "image": "https://images.trvl-media.com/place/7121/60df6131-7dc5-4259-9b89-f91c9d669218.jpg",
-      "base_price": 160,
-      "is_active": 1,
-      "is_manual_quote": 0,
-      "included_items": [
-        "50"
-      ],
-      "excluded_items": [
-        "30"
-      ],
-      "is_featured": 0,
-      "is_instant_pricing_enabled": 1,
-      "display_order": 0,
-      "full_description": "",
-      "faqs": "[]",
-      "notes": "",
-      "created_at": "2026-05-27T04:55:37.000Z",
-      "updated_at": "2026-05-27T04:55:37.000Z"
-    },
-    {
-      "id": "srv-768773",
-      "title": "Espanola Service",
-      "slug": "espanola-service-768773",
-      "description": "We provide most A+ Service",
-      "image": "https://images.trvl-media.com/place/7121/60df6131-7dc5-4259-9b89-f91c9d669218.jpg",
-      "base_price": 160,
-      "is_active": 1,
-      "is_manual_quote": 0,
-      "included_items": [
-        "50"
-      ],
-      "excluded_items": [
-        "30"
-      ],
-      "is_featured": 0,
-      "is_instant_pricing_enabled": 1,
-      "display_order": 0,
-      "full_description": "",
-      "faqs": "[]",
-      "notes": "",
-      "created_at": "2026-05-27T04:55:37.000Z",
-      "updated_at": "2026-05-27T04:55:37.000Z"
-    },
-    {
       "id": "srv-deep",
       "title": "Deep Restoration Suite",
       "slug": "deep-cleaning",
-      "description": "An exhaustive physical overhaul targeting cumulative dust, deep lime and mold remediation, vents detailing, grout deep scrubbing, window-interior polishing, and inside-appliance curations based on diagnostic requirements.",
-      "image": "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&q=80&w=800",
+      "description": "An overhaul...",
+      "image": "https://images.unsplash.com/photo-1773332589460-5a5d43c80f5b?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw4fHx8ZW58MHx8fHx8",
       "base_price": 2500,
       "is_active": 1,
       "is_manual_quote": 0,
-      "included_items": [
-        "All Standard Maintenance inclusion items",
-        "Inside of oven and oven-hood structural grease extraction",
-        "Inside refrigerator detailed shelving scrub & fresh sterilization",
-        "100% steam localized bath grout sanitization",
-        "Detailed hand-wiping of doors, trims, frames, and wide baseboards",
-        "Interior dry-vacuuming of heating vents and filter plates"
-      ],
-      "excluded_items": [
-        "Chandelier deep glass crystal removal and dismantling",
-        "Heavy debris, commercial trash, or post-construction paint stripping"
-      ],
+      "included_items": [],
+      "excluded_items": [],
       "is_featured": 0,
       "is_instant_pricing_enabled": 1,
       "display_order": 0,
       "full_description": "",
-      "faqs": "[]",
+      "faqs": [],
       "notes": "",
-      "created_at": "2026-05-24T18:09:20.000Z",
-      "updated_at": "2026-05-24T18:09:20.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-06-01T07:53:07.000Z"
     },
     {
       "id": "srv-move",
       "title": "Move In / Out Choreography",
       "slug": "move-in-out",
-      "description": "Designed for buyers, renters, and listing agents. We curate complete vertical extraction, inside all shelves, drawers, cabinets, closets, detailing of vents, appliance resets, and standard wall spot cleansing to verify a spotless standard.",
-      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800",
+      "description": "Designed for...",
+      "image": "https://...",
       "base_price": 3500,
       "is_active": 1,
       "is_manual_quote": 0,
-      "included_items": [
-        "Complete empty home bottom-to-ceiling vertical sweep",
-        "Vacuuming, wiping, and sterilizing all inside closets, drawers, and cabinetry",
-        "Complete structural reset of luxury appliances (Oven, Fridge, Dishwasher, Microwave)",
-        "Deep tracking detail of window sliders & glass panes",
-        "Precision spot-cleaning of walls, staircases rails, and baseboards"
-      ],
-      "excluded_items": [
-        "Exterior window washers requiring scaffolding or ladders",
-        "Post-flood mold restorations"
-      ],
+      "included_items": [],
+      "excluded_items": [],
       "is_featured": 0,
       "is_instant_pricing_enabled": 1,
       "display_order": 0,
       "full_description": "",
-      "faqs": "[]",
+      "faqs": [],
       "notes": "",
-      "created_at": "2026-05-24T18:09:20.000Z",
-      "updated_at": "2026-05-24T18:09:20.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "srv-standard",
       "title": "Standard Maintenance Curation",
       "slug": "standard-maintenance",
-      "description": "A meticulous maintenance sweeps encompassing dusting, bespoke organizing, systematic vacuuming, sanitizing high-touch surfaces, and precision bathroom polishing.",
-      "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800",
+      "description": "A sweeps...",
+      "image": "https://...",
       "base_price": 1000,
       "is_active": 1,
       "is_manual_quote": 0,
-      "included_items": [
-        "Sweeping, mopping, and vacuuming all floor layers",
-        "Fine-bristle hand dusting of high-fidelity frames, shelving, and surfaces",
-        "Full kitchen exterior sanitization & deep range-hood degreasing",
-        "Deep bath/shower chrome polishing and glass micro-wipe",
-        "Linen changes & bespoke textile precision alignments"
-      ],
-      "excluded_items": [
-        "Deep lime or mold grout remediation",
-        "Vents interior shaft vacuum extraction",
-        "Inside oven or inside refrigerator (available as Add-on only)",
-        "Empty drawer/closet vacuum clearances (unless Move-In requested)"
-      ],
+      "included_items": [],
+      "excluded_items": [],
       "is_featured": 0,
       "is_instant_pricing_enabled": 1,
       "display_order": 0,
       "full_description": "",
-      "faqs": "[]",
+      "faqs": [],
       "notes": "",
-      "created_at": "2026-05-24T18:09:20.000Z",
-      "updated_at": "2026-05-24T18:09:20.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     }
   ],
   "addons": [
@@ -210,8 +169,8 @@
       "price": 500,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "add-fridge",
@@ -220,8 +179,8 @@
       "price": 300,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "add-oven",
@@ -230,8 +189,8 @@
       "price": 350,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "add-pethair",
@@ -240,8 +199,8 @@
       "price": 450,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "add-windows",
@@ -250,8 +209,8 @@
       "price": 400,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     }
   ],
   "pricingRules": [
@@ -264,8 +223,8 @@
       "price_adjustment": 350,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-bed",
@@ -276,8 +235,8 @@
       "price_adjustment": 250,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-loc-far",
@@ -288,8 +247,8 @@
       "price_adjustment": 1,
       "adjustment_type": "percentage",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-loc-normal",
@@ -300,8 +259,8 @@
       "price_adjustment": 0,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-loc-out",
@@ -312,8 +271,8 @@
       "price_adjustment": 400,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-min-order",
@@ -324,8 +283,8 @@
       "price_adjustment": 999,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-res-condo",
@@ -336,8 +295,8 @@
       "price_adjustment": 0,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-res-house",
@@ -348,8 +307,8 @@
       "price_adjustment": 1000,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-res-office",
@@ -360,8 +319,8 @@
       "price_adjustment": 1500,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-res-town",
@@ -372,8 +331,8 @@
       "price_adjustment": 500,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-urg-next",
@@ -384,8 +343,8 @@
       "price_adjustment": 10,
       "adjustment_type": "percentage",
       "is_active": 1,
-      "created_at": "2026-05-27T10:38:52.000Z",
-      "updated_at": "2026-05-27T10:38:52.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     },
     {
       "id": "pr-urg-same",
@@ -396,77 +355,11 @@
       "price_adjustment": 20,
       "adjustment_type": "percentage",
       "is_active": 1,
-      "created_at": "2026-05-27T16:08:52.000Z",
-      "updated_at": "2026-05-27T16:08:52.000Z"
-    },
-    {
-      "id": "service_base-1780144606685",
-      "service_id": null,
-      "rule_type": "service_base",
-      "rule_name": "Unnamed Rule",
-      "value": "",
-      "price_adjustment": 100,
-      "adjustment_type": "fixed",
-      "is_active": 1,
-      "created_at": "2026-05-30T01:36:46.000Z",
-      "updated_at": "2026-05-29T20:06:46.000Z"
+      "created_at": "2026-05-28T16:41:23.000Z",
+      "updated_at": "2026-05-28T16:41:23.000Z"
     }
   ],
   "coupons": [
-    {
-      "id": "cp-420786",
-      "code": "SUMIT",
-      "name": "Bespoke Promo",
-      "discount_type": "percent",
-      "discount_value": 50,
-      "minimum_order_value": 0,
-      "maximum_discount": 999999,
-      "applicable_services": [],
-      "start_date": "2026-05-30",
-      "end_date": "2030-12-31",
-      "total_usage_limit": 1000,
-      "per_customer_usage_limit": 1,
-      "used_count": 0,
-      "is_active": 1,
-      "created_at": "2026-05-30T07:12:45.444Z",
-      "updated_at": "2026-05-30T07:12:45.444Z"
-    },
-    {
-      "id": "cp-438645",
-      "code": "TEST SUMIT 1",
-      "name": "Bespoke Promo",
-      "discount_type": "percent",
-      "discount_value": 25,
-      "minimum_order_value": 0,
-      "maximum_discount": 999999,
-      "applicable_services": [],
-      "start_date": "2026-06-01",
-      "end_date": "2030-12-31",
-      "total_usage_limit": 1000,
-      "per_customer_usage_limit": 1,
-      "used_count": 0,
-      "is_active": 1,
-      "created_at": "2026-06-01T05:37:36.744Z",
-      "updated_at": "2026-06-01T05:37:36.744Z"
-    },
-    {
-      "id": "cp-913463",
-      "code": "EE",
-      "name": "Bespoke Promo",
-      "discount_type": "percent",
-      "discount_value": 25,
-      "minimum_order_value": 0,
-      "maximum_discount": 999999,
-      "applicable_services": [],
-      "start_date": "2026-05-29",
-      "end_date": "2030-12-31",
-      "total_usage_limit": 1000,
-      "per_customer_usage_limit": 1,
-      "used_count": 0,
-      "is_active": 1,
-      "created_at": "2026-05-29T13:54:24.313Z",
-      "updated_at": "2026-05-29T13:54:24.313Z"
-    },
     {
       "id": "cp-spring15",
       "code": "SPRING15",
@@ -482,8 +375,8 @@
       "per_customer_usage_limit": 1,
       "used_count": 2,
       "is_active": 1,
-      "created_at": "2026-05-29T06:38:52.517Z",
-      "updated_at": "2026-05-29T06:38:52.517Z"
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z"
     },
     {
       "id": "cp-welcome100",
@@ -500,14 +393,14 @@
       "per_customer_usage_limit": 1,
       "used_count": 5,
       "is_active": 1,
-      "created_at": "2026-05-29T06:38:52.503Z",
-      "updated_at": "2026-05-29T06:38:52.503Z"
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z"
     }
   ],
   "orders": [
     {
       "id": "ord-829104",
-      "user_id": "usr-user1",
+      "user_id": 201,
       "order_number": "PST-829104",
       "customer_name": "Jean-Paul Leclerc",
       "email": "j.leclerc@gmail.com",
@@ -548,8 +441,8 @@
       "settlement_status": "Scheduled",
       "admin_internal_notes": "Elite client verified. Dispatched primary team lead.",
       "customer_visible_notes": "Your luxury cleaner chef is scheduled. Expect entry exactly at 9:00 AM.",
-      "created_at": "2026-05-24T16:30:20.000Z",
-      "updated_at": "2026-05-24T16:55:00.000Z",
+      "created_at": "2026-05-20T08:00:20.000Z",
+      "updated_at": "2026-05-20T08:25:00.000Z",
       "accessMethod": "Provide lockbox key coordinates",
       "customKeyNotes": "Lockbox is left of the water mains feed pipe, security code is 4920."
     }
@@ -562,7 +455,7 @@
       "new_status": "Under Review",
       "changed_by": "system",
       "note": "Order initialized dynamically. Sent to queue review.",
-      "created_at": "2026-05-24T16:30:20.000Z"
+      "created_at": "2026-05-20T08:00:20.000Z"
     },
     {
       "id": "h-2",
@@ -571,22 +464,22 @@
       "new_status": "Scheduled",
       "changed_by": "admin",
       "note": "Confirmed dates after manual phone verification. Settled queue booking.",
-      "created_at": "2026-05-24T16:55:00.000Z"
+      "created_at": "2026-05-20T08:25:00.000Z"
     }
   ],
   "tickets": [
     {
       "id": "tkt-001",
       "ticket_number": "TKT-590021",
-      "user_id": "usr-user1",
+      "user_id": 201,
       "order_id": "ord-829104",
       "category": "Scheduling issue",
       "subject": "Coordinating concierges lift booking window",
       "message": "Hello curator, our condo concierge requires a dedicated lift booking voucher to haul clean extraction steam plates. Is this handled by your chef or should I notify our landlord office?",
       "priority": "Medium",
       "status": "Resolved",
-      "created_at": "2026-05-24T17:00:00.000Z",
-      "updated_at": "2026-05-29T13:14:03.000Z"
+      "created_at": "2026-05-20T08:30:00.000Z",
+      "updated_at": "2026-05-25T04:44:03.000Z"
     }
   ],
   "ticketReplies": [
@@ -594,19 +487,19 @@
       "id": "rep-1",
       "ticket_id": "tkt-001",
       "sender_type": "admin",
-      "sender_id": "usr-admin",
+      "sender_id": "1",
       "message": "Dear Jean-Paul, our crew lifts all sanitization items as lightweight hand packs. No major freight elevator reservations are necessary! Let us know if you need certificates details.",
       "attachment": "",
-      "created_at": "2026-05-24T17:15:00.000Z"
+      "created_at": "2026-05-20T08:45:00.000Z"
     },
     {
       "id": "rep-541966",
       "ticket_id": "tkt-001",
       "sender_type": "admin",
-      "sender_id": "usr-admin",
+      "sender_id": "1",
       "message": "hiii \n",
       "attachment": "",
-      "created_at": "2026-05-29T07:44:02.000Z"
+      "created_at": "2026-05-24T23:14:02.000Z"
     }
   ],
   "passwordTokens": [],
@@ -618,204 +511,29 @@
       "phone": "+1 (416) 998-2910",
       "message": "Enquiring about regular weekly office sanitization packages for our bespoke architecture loft in central Queen West.",
       "status": "New",
-      "created_at": "2026-05-24T12:50:00.000Z"
+      "created_at": "2026-05-20T04:20:00.000Z"
     }
   ],
   "emailTemplates": [
     {
-      "id": "guest_account_created",
-      "name": "Guest account created",
-      "subject": "Welcome to getmeamaid - Access Your Client Desk",
-      "body": "<div style=\"font-family: sans-serif; max-width: 600px; padding: 24px; border: 1px solid #eaeaea;\">\n  <h2>Welcome to getmeamaid!</h2>\n  <p>Dear {{customer_name}},</p>\n  <p>We created a guest curator account under your email to help you oversee dispatches. Access your portal details and set up security password parameters at any time.</p>\n  <a href=\"{{set_password_link}}\" style=\"display: inline-block; background: #000; color: #fff; padding: 8px 16px; text-decoration: none; border-radius: 4px;\">Initialize Account Setup</a>\n</div>",
-      "is_active": 1
-    },
-    {
-      "id": "invoice_sent",
-      "name": "Invoice sent",
-      "subject": "Pristine Ledger Invoice INV-{{order_id}}",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Please find attached invoice for Order #{{order_id}} amounting to {{final_amount}}: <a href=\"{{invoice_link}}\">{{invoice_link}}</a></p>",
-      "is_active": 1
-    },
-    {
-      "id": "job_assigned_to_staff",
-      "name": "Job assigned to staff",
-      "subject": "Curator Assignment: Schedule #{{order_id}}",
-      "body": "<p>Hello {{staff_name}},</p>\n<p>You are officially assigned to perform Curation order #{{order_id}} at service location (postal: {{customer_name}}) on {{preferred_date}} at {{preferred_slot}}.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "order_completed",
-      "name": "Order completed",
-      "subject": "Home Curation Complete - Experience Verified",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Your systematic home curation of {{service_name}} is completed. We have generated your high-fidelity review logs.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "order_confirmation",
-      "name": "Order confirmation",
-      "subject": "getmeamaid Appointment Confirmed - Order #{{order_id}}",
-      "body": "<div style=\"font-family: sans-serif; max-width: 600px; padding: 24px; border: 1px solid #eaeaea; border-radius: 12px;\">\n  <h2 style=\"color: #0f172a;\">Appointment Securely Processed!</h2>\n  <p>Dear <strong>{{customer_name}}</strong>,</p>\n  <p>Thank you for choosing getmeamaid. Your reservation for <strong>{{service_name}}</strong> on <strong>{{preferred_date}}</strong> during <strong>{{preferred_slot}}</strong> is verified.</p>\n  <p>Order Summary Ref: <strong>#{{order_id}}</strong></p>\n  <p>Total Pricing: <strong>{{final_amount}}</strong></p>\n  <p>If you need to make scheduling edits, visit your client panel prior to 24 hours of service.</p>\n</div>",
-      "is_active": 1
-    },
-    {
-      "id": "password_reset",
-      "name": "Password reset",
-      "subject": "Curator Password Reset Link",
-      "body": "<p>Please restore account access through reset dashboard links: <a href=\"{{set_password_link}}\">Reset Password link</a></p>",
-      "is_active": 1
-    },
-    {
-      "id": "payment_confirmed",
-      "name": "Payment confirmed",
-      "subject": "Payment Confirmed - Ledger Verified",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Your payment of <strong>{{final_amount}}</strong> is confirmed. All dispatch services will proceed as scheduled.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "payment_link_sent",
-      "name": "Payment link sent",
-      "subject": "Payment Link Prepared for Order #{{order_id}}",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>We have compiled your payment schedule of <strong>{{final_amount}}</strong>. Please access the secure portal gateway to authorize billing:</p>\n<a href=\"{{payment_link}}\">Submit Payment Authorization</a>",
-      "is_active": 1
-    },
-    {
-      "id": "payment_reminder",
-      "name": "Payment reminder",
-      "subject": "Action Required: Outstanding Reconcile Reminder",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>This is an automated prompt that payment for order #{{order_id}} (Amount: {{final_amount}}) is pending allocation.</p>\n<a href=\"{{payment_link}}\">Reconcile Now</a>",
-      "is_active": 1
-    },
-    {
-      "id": "quote_sent",
-      "name": "Quote sent",
-      "subject": "Your Bespoke Cleaner Estimate Quote is Ready",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Our audit team completed estimation metrics for Order #{{order_id}}. Your proposed quote breakdown of <strong>{{final_amount}}</strong> is ready for verification.</p>\n<p>Link: <a href=\"{{payment_link}}\">View Estimator Quote</a></p>",
-      "is_active": 1
-    },
-    {
-      "id": "schedule_confirmed",
-      "name": "Schedule confirmed",
-      "subject": "Staff Dispatch Schedule Confirmed #{{order_id}}",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Your arrival window is set for <strong>{{preferred_date}}</strong> within <strong>{{preferred_slot}}</strong>. Our elite curators look forward to presenting absolute luxury.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "set_password_link",
-      "name": "Set password link",
-      "subject": "Initialize Your Curator Account Password",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Please establish your new password to verify credentials: <a href=\"{{set_password_link}}\">{{set_password_link}}</a></p>",
-      "is_active": 1
-    },
-    {
-      "id": "settlement_completed",
-      "name": "Settlement completed",
-      "subject": "Accounts Settlement Processed",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Your account invoice statement is reconciled and settled successfully. We thank you for choosing getmeamaid.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "ticket_closed",
-      "name": "Ticket closed",
-      "subject": "Support File #{{ticket_id}} Closed",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>This support inquiry has been resolved and closed from active consoles.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "ticket_created",
-      "name": "Ticket created",
-      "subject": "Support Desk Registered - Ticket #{{ticket_id}}",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>We registered your support filing #{{ticket_id}} regarding: <strong>{{status}}</strong>. A concierge analyst will correspond immediately.</p>",
-      "is_active": 1
-    },
-    {
-      "id": "ticket_replied",
-      "name": "Ticket replied",
-      "subject": "Analyst Reply Received: Ticket #{{ticket_id}}",
-      "body": "<p>Dear {{customer_name}},</p>\n<p>Our desk updated ticket {{ticket_id}}. Correspondence: </p><p style=\"padding: 10px; background: #eee;\">{{status}}</p>",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-order-complete",
-      "name": "Order Completed",
-      "subject": "Atelier Restoration Sweep Certified - #{order_id}",
-      "body": "Dear {customer_name},\n\nYour luxury restoration sweep #{order_id} is completed. Our team has polished every surface. Please rate your experience in your dashboard or raise ticket if any detail requires supplementary touch.",
-      "is_active": 1
-    },
-    {
       "id": "tpl-order-confirm",
       "name": "Order Confirmation",
-      "subject": "Your Pristine Atelier Dispatch Receipt [#{order_id}]",
-      "body": "Hello {customer_name},\n\nWe have received your luxury maintenance request #{order_id} for a meticulously curated {service_name}.\n\nPreferred Date: {preferred_date}\nPreferred Time: {preferred_slot}\nOriginal Estimate Code: {final_price}\n\nOur curation team is currently reviewing your schedule request. We will finalize your slot allocations and deliver dispatch quotes promptly. Thank you for selecting The Pristine Editorial.\n\nWarm regards,\nThe Pristine Atelier Core",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-order-schedule",
-      "name": "Order Scheduled",
-      "subject": "Atelier Schedule Finalized - Dispatch #{order_id}",
-      "body": "Hello {customer_name},\n\nGood news! Your suite curation is finalized for {preferred_date} ({preferred_slot}). We have confirmed entry coordinates. Our verified crew chief will contact you upon dispatch. Thank you!",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-password-reset",
-      "name": "Password Reset",
-      "subject": "Pristine Atelier Reset Password Request",
-      "body": "Hello {customer_name},\n\nYou requested a password reset. Configure your new password entry code inside 1 hour: {payment_link}",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-payment-confirm",
-      "name": "Payment Confirmed",
-      "subject": "Payments Verification Certified - Order #{order_id} Paid",
-      "body": "Dear {customer_name},\n\nThis certifies that payments for Order #{order_id} have been audited successfully and marked as PAID.\n\nThank you for choosing luxury, bespoke cleanings.",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-payment-sent",
-      "name": "Payment Link Sent",
-      "subject": "Pending Payments Verification - Pristine Atelier #{order_id}",
-      "body": "Dear {customer_name},\n\nWe have generated a manual invoice payment guide for Order #{order_id}.\n\nLocked Amount: {final_price}\n\nPlease proceed with transfer/transfer coordinates according to our guidelines: {payment_link}\n\nOur team will manually audit payment confirmations within 1 business cycle.",
+      "subject": "Your Receipt [#{order_id}]",
+      "body": "Hello {customer_name}, code {final_price}",
       "is_active": 1
     },
     {
       "id": "tpl-quote-sent",
       "name": "Quote Sent",
-      "subject": "Your Customized Editorial Sweep Dispatch Quote [#{order_id}]",
-      "body": "Hello {customer_name},\n\nOur team has reviewed your order #{order_id} for {service_name}.\n\nYour customized total dispatch price has been locked at {final_price}.\n\nPreferred Date: {preferred_date} ({preferred_slot})\n\nPlease finalize this dispatch block prior to our booking threshold by referencing instructions: {payment_link}\n\nWarmest regards,\nThe Pristine Editorial Team",
+      "subject": "Your Quote [#{order_id}]",
+      "body": "Hello {customer_name}, {final_price}",
       "is_active": 1
     },
     {
       "id": "tpl-set-password",
-      "name": "Set Password (Guest Auto)",
-      "subject": "Complete Your Pristine Atelier Account Setup",
-      "body": "Hello {customer_name},\n\nWe created an account so you can track your order #{order_id} and raise support tickets with ease.\n\nPlease select the link below to configure your custom entry password securely within 24 hours:\n{payment_link}\n\nThank you,\nThe Pristine Core",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-settlement-confirm",
-      "name": "Settlement Completed",
-      "subject": "Pristine Dispatch Reference #{order_id} Settled",
-      "body": "Hello {customer_name},\n\nThis confirms that order #{order_id} is now settled, completed, and closed. We thank you for choosing Pristine. Let us know of your next maintenance curation block.",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-ticket-closed",
-      "name": "Ticket Closed",
-      "subject": "[#{ticket_id}] Support Ticket Resolved & Closed",
-      "body": "Hello {customer_name},\n\nThis is to notify you that support ticket #{ticket_id} is now closed. Thank you.",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-ticket-created",
-      "name": "Ticket Created",
-      "subject": "[#{ticket_id}] Ticket Received - Support Module",
-      "body": "Hello {customer_name},\n\nWe have received your ticket request regarding priority {status}. Our curators are looking into this details and will message you via dashboard inbox shortly.",
-      "is_active": 1
-    },
-    {
-      "id": "tpl-ticket-replied",
-      "name": "Ticket Replied",
-      "subject": "[#{ticket_id}] Support Curator Reply Alert",
-      "body": "Hello {customer_name},\n\nAn administrator has posted an update to your ticket #{ticket_id}. Read the reply and update comments inside your customer dashboard support logs.",
+      "name": "Set Password",
+      "subject": "Complete Setup",
+      "body": "Hello {customer_name}, {payment_link}",
       "is_active": 1
     }
   ],
@@ -825,7 +543,7 @@
       "to_email": "sumit@gmail.com",
       "subject": "Atelier Restoration Sweep Certified - #PRE-585825",
       "body": "Dear Sumit Dutta,\n\nYour luxury restoration sweep #PRE-585825 is completed. Our team has polished every surface. Please rate your experience in your dashboard or raise ticket if any detail requires supplementary touch.",
-      "sent_at": "2026-05-29T13:16:32.000Z",
+      "sent_at": "2026-05-25T04:46:32.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -840,7 +558,7 @@
       "to_email": "j.leclerc@gmail.com",
       "subject": "[#TKT-590021] Ticket Received - Support Module",
       "body": "Hello Jean-Paul Leclerc,\n\nWe have received your ticket request regarding priority Resolved. Our curators are looking into this details and will message you via dashboard inbox shortly.",
-      "sent_at": "2026-05-29T13:14:03.000Z",
+      "sent_at": "2026-05-25T04:44:03.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -855,7 +573,7 @@
       "to_email": "j.leclerc@gmail.com",
       "subject": "[#TKT-590021] Support Curator Reply Alert",
       "body": "Hello Jean-Paul Leclerc,\n\nAn administrator has posted an update to your ticket #TKT-590021. Read the reply and update comments inside your customer dashboard support logs.",
-      "sent_at": "2026-05-29T07:44:02.000Z",
+      "sent_at": "2026-05-24T23:14:02.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -870,7 +588,7 @@
       "to_email": "sumit@gmail.com",
       "subject": "Payments Verification Certified - Order #PRE-585825 Paid",
       "body": "Dear Sumit Dutta,\n\nThis certifies that payments for Order #PRE-585825 have been audited successfully and marked as PAID.\n\nThank you for choosing luxury, bespoke cleanings.",
-      "sent_at": "2026-05-29T02:11:57.000Z",
+      "sent_at": "2026-05-24T17:41:57.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -907,149 +625,137 @@
   "servicePricingRules": [],
   "roles": [
     {
-      "id": "role-275754",
-      "name": "test 1",
-      "permissions": [
-        "edit_orders",
-        "view_orders",
-        "assign_jobs",
-        "update_order_status"
-      ],
-      "is_active": true,
-      "created_at": "2026-05-30T12:37:42.065Z",
-      "updated_at": "2026-05-30T12:37:42.065Z"
-    },
-    {
-      "id": "role-accounts-staff",
-      "name": "Accounts Staff",
-      "permissions": [
-        "view_orders",
-        "update_order_status",
-        "view_reports",
-        "download_invoices"
-      ],
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.533Z",
-      "updated_at": "2026-05-30T10:56:37.533Z"
-    },
-    {
-      "id": "role-field-staff",
-      "name": "Field Staff",
-      "permissions": [
-        "view_staff_jobs"
-      ],
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.532Z",
-      "updated_at": "2026-05-30T10:56:37.532Z"
-    },
-    {
-      "id": "role-manager",
-      "name": "Manager",
-      "permissions": [
-        "view_orders",
-        "edit_orders",
-        "update_order_status",
-        "assign_jobs",
-        "view_customers",
-        "manage_services",
-        "manage_pricing",
-        "manage_coupons",
-        "view_reports",
-        "download_invoices",
-        "manage_tickets"
-      ],
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.528Z",
-      "updated_at": "2026-05-30T10:56:37.528Z"
-    },
-    {
-      "id": "role-super-admin",
+      "id": 1,
       "name": "Super Admin",
-      "permissions": [
-        "view_orders",
-        "edit_orders",
-        "update_order_status",
-        "assign_jobs",
-        "view_customers",
-        "manage_services",
-        "manage_pricing",
-        "manage_coupons",
-        "view_reports",
-        "download_invoices",
-        "manage_tickets",
-        "manage_staff",
-        "manage_roles",
-        "manage_email_templates"
-      ],
       "is_active": true,
-      "created_at": "2026-05-30T10:56:37.526Z",
-      "updated_at": "2026-05-30T10:56:37.526Z"
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z",
+      "permissions": [
+        "assign_jobs",
+        "download_invoices",
+        "edit_orders",
+        "manage_cms",
+        "manage_coupons",
+        "manage_email_templates",
+        "manage_pricing",
+        "manage_roles",
+        "manage_services",
+        "manage_settings",
+        "manage_staff",
+        "manage_tickets",
+        "update_order_status",
+        "view_customers",
+        "view_dashboard",
+        "view_orders",
+        "view_reports",
+        "view_slots"
+      ]
     },
     {
-      "id": "role-support-staff",
-      "name": "Support Staff",
-      "permissions": [
-        "view_orders",
-        "edit_orders",
-        "update_order_status",
-        "manage_tickets",
-        "manage_coupons"
-      ],
+      "id": 2,
+      "name": "Manager",
       "is_active": true,
-      "created_at": "2026-05-30T10:56:37.530Z",
-      "updated_at": "2026-05-30T10:56:37.530Z"
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z",
+      "permissions": [
+        "assign_jobs",
+        "download_invoices",
+        "manage_coupons",
+        "manage_pricing",
+        "manage_services",
+        "manage_tickets",
+        "update_order_status",
+        "view_orders",
+        "view_reports",
+        "view_staff_jobs"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Support Staff",
+      "is_active": true,
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z",
+      "permissions": [
+        "edit_orders",
+        "manage_coupons",
+        "manage_tickets",
+        "update_order_status",
+        "view_orders"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Field Staff",
+      "is_active": true,
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z",
+      "permissions": [
+        "assign_jobs",
+        "edit_orders",
+        "manage_services",
+        "manage_tickets",
+        "update_order_status",
+        "view_dashboard",
+        "view_orders",
+        "view_reports",
+        "view_staff_jobs"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Accounts Staff",
+      "is_active": true,
+      "created_at": "2026-06-01T08:41:23.000Z",
+      "updated_at": "2026-06-01T08:41:23.000Z",
+      "permissions": [
+        "download_invoices",
+        "update_order_status",
+        "view_orders",
+        "view_reports"
+      ]
     }
   ],
   "staff": [
     {
-      "id": "stf-1",
-      "name": "Arthur Pendelton",
-      "email": "arthur@pristine.com",
-      "phone": "+1 (416) 555-0101",
-      "role_id": "role-field-staff",
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.537Z",
-      "updated_at": "2026-05-30T10:56:37.537Z"
+      "id": 1,
+      "name": "Pristine Atelier Admin",
+      "email": "admin@gmail.com",
+      "phone": "+1 (416) 555-0100",
+      "role_id": 1,
+      "is_active": true
     },
     {
-      "id": "stf-2",
+      "id": 101,
+      "name": "SUMIT Pendelton",
+      "email": "sumit@pristine.com",
+      "phone": "9876543210",
+      "role_id": 1,
+      "is_active": true
+    },
+    {
+      "id": 102,
       "name": "Jessica Vance",
       "email": "jessica@pristine.com",
       "phone": "+1 (416) 555-0102",
-      "role_id": "role-field-staff",
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.539Z",
-      "updated_at": "2026-05-30T10:56:37.539Z"
+      "role_id": 4,
+      "is_active": true
     },
     {
-      "id": "stf-3",
+      "id": 103,
       "name": "Michael Chen",
       "email": "michael@pristine.com",
       "phone": "+1 (416) 555-0103",
-      "role_id": "role-manager",
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.541Z",
-      "updated_at": "2026-05-30T10:56:37.541Z"
+      "role_id": 2,
+      "is_active": true
     },
     {
-      "id": "stf-4",
-      "name": "Sarah Connor",
-      "email": "sarah@pristine.com",
-      "phone": "+1 (416) 555-0104",
-      "role_id": "role-support-staff",
-      "is_active": true,
-      "created_at": "2026-05-30T10:56:37.542Z",
-      "updated_at": "2026-05-30T10:56:37.542Z"
-    },
-    {
-      "id": "stf-455938",
+      "id": 301,
       "name": "TEST STUFF SUMIT",
       "email": "s@g.com",
       "phone": "+1 (416) 555-4821",
-      "role_id": "role-field-staff",
-      "is_active": true,
-      "created_at": "2026-05-30T11:09:31.406Z",
-      "updated_at": "2026-05-30T11:10:36.240Z"
+      "role_id": 4,
+      "is_active": true
     }
   ]
 }

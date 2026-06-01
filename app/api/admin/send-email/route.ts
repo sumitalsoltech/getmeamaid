@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { getEmailTemplates, logEmail } from '@/lib/dbStore';
+import { getMysql } from '@/lib/mysql';
+import { authorize } from '@/lib/authMiddleware';
 
 function replacePlaceholders(text: string, data: Record<string, any>): string {
   let result = text;
@@ -15,23 +17,39 @@ function replacePlaceholders(text: string, data: Record<string, any>): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const {
-      recipientEmail,
-      templateId,
-      orderData = {},
-      sentBy = 'administrator',
-      force = false
-    } = body;
+    const auth = await authorize(req, 'manage_email_templates');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
 
-    const templates = getEmailTemplates();
-    const template = templates.find(t => t.id === templateId);
+    if (auth.user && Number(auth.user.role_id) === 4) {
+      return NextResponse.json({ success: false, error: 'Forbidden. Field staff are not permitted to dispatch manual emails.' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const recipientEmail = body.recipientEmail || body.recipient_email || body.to_email;
+    const templateId = body.templateId || body.email_type || body.template_used;
+    const orderData = body.orderData || body || {};
+    const sentBy = auth.user?.name || body.sentBy || body.sent_by || 'administrator';
+    const force = body.force || false;
+
+    const mysqlClient = getMysql();
+    let template: any = null;
+    if (mysqlClient) {
+      const { data } = await mysqlClient.from('email_templates').select('*').eq('id', templateId);
+      template = data?.[0];
+    }
+    if (!template) {
+      const templates = getEmailTemplates();
+      template = templates.find(t => t.id === templateId);
+    }
 
     if (!template) {
       return NextResponse.json({ success: false, error: `Email template '${templateId}' not found.` }, { status: 404 });
     }
 
-    if (!template.is_active && !force) {
+    const isActive = template.is_active === undefined || template.is_active === null || !!template.is_active;
+    if (!isActive && !force) {
       return NextResponse.json({ success: false, error: 'Template is inactive.' }, { status: 400 });
     }
 
@@ -44,7 +62,7 @@ export async function POST(req: NextRequest) {
       customer_name: orderData.customer_name || `${orderData.first_name || ''} ${orderData.last_name || ''}`.trim() || 'Client',
       order_id: orderData.order_id || orderData.id || 'PRE-NEW',
       service_name: orderData.service_name || orderData.restoration_level || 'Atelier Standard',
-      final_amount: orderData.final_amount || (orderData.pricing ? (typeof orderData.pricing === 'string' ? JSON.parse(orderData.pricing).total : orderData.pricing.total) : '') || '$140.00',
+      final_amount: orderData.final_amount || orderData.amount || (orderData.pricing ? (typeof orderData.pricing === 'string' ? JSON.parse(orderData.pricing).total : orderData.pricing.total) : '') || '$180.00',
       coupon_code: orderData.coupon_code || orderData.coupon || '-',
       discount_amount: orderData.discount_amount || '$0.00',
       payment_link: orderData.payment_link || `https://getmeamaid.ca/payment/${orderData.id || 'new'}`,
@@ -86,15 +104,51 @@ export async function POST(req: NextRequest) {
     }
 
     // Save transaction in logs
-    const logged = logEmail({
-      email_type: template.name,
-      recipient_email: recipientEmail,
-      related_entity_id: placeholders.order_id || placeholders.ticket_id,
-      template_used: template.id,
-      sent_by: sentBy,
-      status: sentStatus,
-      error_message: errorMessage
-    });
+    const newLogId = `log-${Math.floor(100000 + Math.random() * 900000)}`;
+    const timestamp = new Date().toISOString();
+    let logged: any = null;
+
+    if (mysqlClient) {
+      const { error } = await mysqlClient.from('email_logs').insert([{
+        id: newLogId,
+        email_type: template.name,
+        recipient_email: recipientEmail,
+        to_email: recipientEmail,
+        subject: finalSubject,
+        body: finalHtmlBody,
+        related_entity_id: placeholders.order_id || placeholders.ticket_id,
+        template_used: template.id,
+        sent_by: sentBy,
+        status: sentStatus,
+        error_message: errorMessage,
+        sent_at: timestamp
+      }]);
+      if (!error) {
+        logged = {
+          id: newLogId,
+          email_type: template.name,
+          recipient_email: recipientEmail,
+          related_entity_id: placeholders.order_id || placeholders.ticket_id,
+          template_used: template.id,
+          sent_by: sentBy,
+          created_at: timestamp,
+          status: sentStatus,
+          error_message: errorMessage
+        };
+      }
+    }
+
+    if (!logged) {
+      logged = logEmail({
+        email_type: template.name,
+        recipient_email: recipientEmail,
+        related_entity_id: placeholders.order_id || placeholders.ticket_id,
+        template_used: template.id,
+        sent_by: sentBy,
+        status: sentStatus,
+        error_message: errorMessage
+      });
+    }
 
     return NextResponse.json({
       success: sentStatus === 'sent',

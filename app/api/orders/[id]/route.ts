@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMysql } from '@/lib/mysql';
 import { getDbAsync, triggerEmail } from '@/lib/db';
+import { authorize, checkPermission } from '@/lib/authMiddleware';
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -9,18 +10,6 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     const mysqlClient = getMysql();
     if (!mysqlClient) {
       return NextResponse.json({ error: 'Database client not initialized.' }, { status: 500 });
-    }
-
-    const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-    if (!userIdCookie) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-    }
-
-    // Fetch user details from database
-    const { data: usersList } = await mysqlClient.from('app_users').select('*').eq('id', userIdCookie);
-    const user = usersList?.[0];
-    if (!user) {
-      return NextResponse.json({ error: 'User account not found.' }, { status: 401 });
     }
 
     // Fetch existing booking from database
@@ -32,8 +21,29 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 
     const body = await req.json();
 
-    // Standard client cancellation
-    if (!user.is_admin) {
+    // 1. Check if they have a valid admin session
+    const auth = await authorize(req);
+    let isAuthorizedAdmin = false;
+    let user = null;
+
+    if (auth.authorized && auth.user) {
+      isAuthorizedAdmin = true;
+      user = auth.user;
+    } else {
+      // 2. If not admin, check if they are the customer
+      const userIdCookie = req.cookies.get('pristine_user_id')?.value;
+      if (userIdCookie) {
+        const { data: usersList } = await mysqlClient.from('users').select('*').eq('id', userIdCookie);
+        user = usersList?.[0];
+      }
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+    }
+
+    // Standard client cancellation (for non-admins)
+    if (!isAuthorizedAdmin) {
       if (body.action === 'cancel') {
         if (existing.email !== user.email && existing.user_id !== user.id) {
           return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
@@ -61,7 +71,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
         await mysqlClient.from('order_status_history').insert([statusLog]);
 
         // email admin
-        triggerEmail('tpl-ticket-closed', 'curator@pristineeditorial.com', {
+        triggerEmail('tpl-ticket-closed', 'admin@gmail.com', {
           customer_name: 'System Alert',
           ticket_id: existing.id,
           status: 'Cancelled [By Customer]'
@@ -77,6 +87,21 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     // Admin updates
     const oldStatus = existing.status;
     const oldPayment = existing.payment_status;
+
+    // Check permissions for administrative operations
+    if (isAuthorizedAdmin) {
+      let requiredPermission = 'edit_orders';
+      if (body.assigned_staff_id !== undefined) {
+        requiredPermission = 'assign_jobs';
+      } else if (body.order_status !== undefined) {
+        requiredPermission = 'update_order_status';
+      }
+
+      const hasPerm = await checkPermission(user.role_id, requiredPermission);
+      if (!hasPerm) {
+        return NextResponse.json({ error: `Forbidden. Missing required permission: ${requiredPermission}` }, { status: 403 });
+      }
+    }
 
     // Body could contain standard updates or a full booking payload
     const {
@@ -212,25 +237,32 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
       return NextResponse.json({ error: 'Database client not initialized.' }, { status: 500 });
     }
 
-    const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-    if (!userIdCookie) {
-      return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-    }
-
-    const { data: usersList } = await mysqlClient.from('app_users').select('*').eq('id', userIdCookie);
-    const user = usersList?.[0];
-    if (!user) {
-      return NextResponse.json({ error: 'User not found.' }, { status: 401 });
-    }
-
     const { data: bookingsList } = await mysqlClient.from('bookings').select('*').eq('id', id);
     const order = bookingsList?.[0];
     if (!order) {
       return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
     }
 
-    if (!user.is_admin && order.email !== user.email && order.user_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+    // 1. Check if they have an admin session
+    const auth = await authorize(req, 'view_orders');
+    let isAuthorizedAdmin = auth.authorized;
+    let user = auth.user;
+
+    if (!isAuthorizedAdmin) {
+      // 2. If not admin, check if they are the customer
+      const userIdCookie = req.cookies.get('pristine_user_id')?.value;
+      if (userIdCookie) {
+        const { data: usersList } = await mysqlClient.from('users').select('*').eq('id', userIdCookie);
+        user = usersList?.[0];
+      }
+      
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+      }
+
+      if (order.email !== user.email && order.user_id !== user.id) {
+        return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+      }
     }
 
     // Get order status timeline

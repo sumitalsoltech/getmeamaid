@@ -88,7 +88,7 @@ export default function Contact() {
               <Mail className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
               <div>
                 <span className="text-[10px] font-bold text-on-surface-variant block uppercase tracking-wider mb-1">EMAIL CHANNELS</span>
-                <span className="text-primary font-bold block hover:text-secondary transition-colors">curator@pristineeditorial.com</span>
+                <span className="text-primary font-bold block hover:text-secondary transition-colors">admin@gmail.com</span>
                 <span className="text-[10px] text-on-surface-variant/70 block mt-1">Response threshold: Under 12 Hours</span>
               </div>
             </div>

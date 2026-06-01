@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMysql } from '@/lib/mysql';
 import { getDbAsync, saveDb } from '@/lib/db';
+import { authorize } from '@/lib/authMiddleware';
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,6 +27,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await authorize(req, 'manage_services');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
+
     const body = await req.json();
     const mysqlClient = getMysql();
     if (mysqlClient) {

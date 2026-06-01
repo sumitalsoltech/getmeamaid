@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { getMysql } from '@/lib/mysql';
 import { getLocalBookings, saveLocalBooking, BookingRecord, logEmail } from '@/lib/dbStore';
+import { authorize } from '@/lib/authMiddleware';
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = await authorize(req, 'view_orders');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
+
     const mysqlClient = getMysql();
     if (mysqlClient) {
       const { data, error } = await mysqlClient

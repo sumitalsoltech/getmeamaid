@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMysql } from '@/lib/mysql';
 import { getDbAsync, saveDbAsync } from '@/lib/db';
+import { authorize } from '@/lib/authMiddleware';
 
 export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await authorize(req, 'manage_services');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
     const { id } = await props.params;
     const mysqlClient = getMysql();
     if (mysqlClient) {
@@ -39,6 +44,10 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 
 export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await authorize(req, 'manage_services');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
     const { id } = await props.params;
     const body = await req.json();
     const mysqlClient = getMysql();

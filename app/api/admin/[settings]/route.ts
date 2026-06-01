@@ -1,5 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb, saveDb, triggerEmail, Service, AddOn, PricingRule, Coupon, Slot, EmailTemplate, getDbAsync, saveDbAsync } from '@/lib/db';
+import bcrypt from 'bcryptjs';
+import { authorize } from '@/lib/authMiddleware';
+
+const SETTINGS_PERMISSIONS: Record<string, string> = {
+  'services': 'manage_services',
+  'pricing-rules': 'manage_pricing',
+  'coupons': 'manage_coupons',
+  'slots': 'view_slots',
+  'staff': 'manage_staff',
+  'roles': 'manage_roles',
+  'users': 'view_customers',
+  'enquiries': 'view_customers',
+  'email-templates': 'manage_email_templates',
+  'email-logs': 'manage_email_templates'
+};
+
 
 // Generic CRUD endpoint for Admin settings
 export async function GET(req: NextRequest, props: { params: Promise<{ settings: string }> }) {
@@ -7,20 +23,10 @@ export async function GET(req: NextRequest, props: { params: Promise<{ settings:
   const settings = params.settings;
   const db = await getDbAsync();
 
-  // Validate admin
-  const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-  if (!userIdCookie) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-  }
-
-  const user = db.users.find(u => u.id === userIdCookie);
-  if (!user) {
-    return NextResponse.json({ error: 'User block not found.' }, { status: 401 });
-  }
-
-  // Except enquiries POST (which is created from contact page which runs GET sometimes, but let's allow read only for admin)
-  if (!user.is_admin) {
-    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const reqPermission = SETTINGS_PERMISSIONS[settings];
+  const auth = await authorize(req, reqPermission);
+  if (!auth.authorized) {
+    return auth.response!;
   }
 
   if (settings === 'services') {
@@ -83,8 +89,6 @@ export async function POST(req: NextRequest, props: { params: Promise<{ settings
   const settings = params.settings;
   const db = await getDbAsync();
 
-  const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-  const user = userIdCookie ? db.users.find(u => u.id === userIdCookie) : null;
 
   // Enquiries creation can be anonymous
   if (settings === 'enquiries') {
@@ -124,9 +128,10 @@ export async function POST(req: NextRequest, props: { params: Promise<{ settings
     }
   }
 
-  // Security Gate for others
-  if (!user || !user.is_admin) {
-    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const reqPermission = SETTINGS_PERMISSIONS[settings];
+  const auth = await authorize(req, reqPermission);
+  if (!auth.authorized) {
+    return auth.response!;
   }
 
   try {
@@ -230,21 +235,62 @@ export async function POST(req: NextRequest, props: { params: Promise<{ settings
     }
 
     if (settings === 'staff') {
-      const { name, email, phone, role_id, is_active } = body;
+      const { name, email, phone, role_id, is_active, password } = body;
       if (!name || !email) {
         return NextResponse.json({ error: 'Name and email are required.' }, { status: 400 });
       }
-      const newStaff = {
-        id: `stf-${Math.floor(100000 + Math.random() * 900000)}`,
+
+      // Hash custom password if provided, otherwise default password
+      let password_hash: string;
+      if (password && password.trim() !== '') {
+        password_hash = bcrypt.hashSync(password, 10);
+      } else {
+        const firstName = name.split(' ')[0].toLowerCase();
+        const defaultPassword = `${firstName}123`;
+        password_hash = bcrypt.hashSync(defaultPassword, 10);
+      }
+
+      const newStaffId = Math.floor(100000 + Math.random() * 900000);
+      const newStaffUser = {
+        id: newStaffId,
         name,
         email,
         phone: phone || '',
-        role_id: role_id || 'role-field-staff',
+        password_hash,
+        role_id: Number(role_id) || 4, // default to Field Staff
+        account_source: 'signup' as const,
+        email_verified_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_admin: false,
         is_active: is_active !== false
       };
-      db.staff.push(newStaff);
+      db.users.push(newStaffUser);
+      
+      // Update staff list
+      db.staff = db.users
+        .filter(u => u.role_id !== null && u.role_id !== undefined)
+        .map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone || '',
+          role_id: u.role_id!,
+          is_active: u.is_active !== false
+        }));
+
       saveDb(db);
-      return NextResponse.json({ success: true, staff: newStaff });
+      return NextResponse.json({
+        success: true,
+        staff: {
+          id: newStaffUser.id,
+          name: newStaffUser.name,
+          email: newStaffUser.email,
+          phone: newStaffUser.phone,
+          role_id: newStaffUser.role_id,
+          is_active: newStaffUser.is_active
+        }
+      });
     }
 
     if (settings === 'roles') {
@@ -253,7 +299,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ settings
         return NextResponse.json({ error: 'Role name is required.' }, { status: 400 });
       }
       const newRole = {
-        id: `role-${Math.floor(100000 + Math.random() * 900000)}`,
+        id: Math.floor(100000 + Math.random() * 900000),
         name,
         permissions: permissions || [],
         is_active: is_active !== false
@@ -275,14 +321,10 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ settings:
   const settings = params.settings;
   const db = await getDbAsync();
 
-  const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-  if (!userIdCookie) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-  }
-
-  const user = db.users.find(u => u.id === userIdCookie);
-  if (!user || !user.is_admin) {
-    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const reqPermission = SETTINGS_PERMISSIONS[settings];
+  const auth = await authorize(req, reqPermission);
+  if (!auth.authorized) {
+    return auth.response!;
   }
 
   try {
@@ -406,23 +448,50 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ settings:
     }
 
     if (settings === 'staff') {
-      const index = db.staff.findIndex(s => s.id === id);
+      const index = db.staff.findIndex(s => String(s.id) === String(id));
       if (index === -1) return NextResponse.json({ error: 'Staff member not found.' }, { status: 404 });
       
       const s = db.staff[index];
-      const { name, email, phone, role_id, is_active } = body;
+      const { name, email, phone, role_id, is_active, password } = body;
+      
+      const userIndex = db.users.findIndex(u => String(u.id) === String(id));
+      if (userIndex !== -1) {
+        const u = db.users[userIndex];
+        if (name !== undefined) u.name = name;
+        if (email !== undefined) u.email = email;
+        if (phone !== undefined) u.phone = phone;
+        if (role_id !== undefined) u.role_id = Number(role_id);
+        if (is_active !== undefined) u.is_active = is_active;
+        if (password !== undefined && password.trim() !== '') {
+          u.password_hash = bcrypt.hashSync(password, 10);
+        }
+        u.updated_at = new Date().toISOString();
+      }
+
       if (name !== undefined) s.name = name;
       if (email !== undefined) s.email = email;
       if (phone !== undefined) s.phone = phone;
-      if (role_id !== undefined) s.role_id = role_id;
+      if (role_id !== undefined) s.role_id = Number(role_id);
       if (is_active !== undefined) s.is_active = is_active;
+
+      // Update staff list
+      db.staff = db.users
+        .filter(u => u.role_id !== null && u.role_id !== undefined)
+        .map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone || '',
+          role_id: u.role_id!,
+          is_active: u.is_active !== false
+        }));
 
       saveDb(db);
       return NextResponse.json({ success: true, staff: s });
     }
 
     if (settings === 'roles') {
-      const index = db.roles.findIndex(r => r.id === id);
+      const index = db.roles.findIndex(r => String(r.id) === String(id));
       if (index === -1) return NextResponse.json({ error: 'Role not found.' }, { status: 404 });
       
       const r = db.roles[index];
@@ -447,14 +516,10 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ settin
   const settings = params.settings;
   const db = await getDbAsync();
 
-  const userIdCookie = req.cookies.get('pristine_user_id')?.value;
-  if (!userIdCookie) {
-    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
-  }
-
-  const user = db.users.find(u => u.id === userIdCookie);
-  if (!user || !user.is_admin) {
-    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  const reqPermission = SETTINGS_PERMISSIONS[settings];
+  const auth = await authorize(req, reqPermission);
+  if (!auth.authorized) {
+    return auth.response!;
   }
 
   try {
@@ -512,13 +577,14 @@ export async function DELETE(req: NextRequest, props: { params: Promise<{ settin
     }
 
     if (settings === 'staff') {
-      db.staff = db.staff.filter(s => s.id !== id);
+      db.users = db.users.filter(u => String(u.id) !== id);
+      db.staff = db.staff.filter(s => String(s.id) !== id);
       saveDb(db);
       return NextResponse.json({ success: true });
     }
 
     if (settings === 'roles') {
-      db.roles = db.roles.filter(r => r.id !== id);
+      db.roles = db.roles.filter(r => String(r.id) !== id);
       saveDb(db);
       return NextResponse.json({ success: true });
     }

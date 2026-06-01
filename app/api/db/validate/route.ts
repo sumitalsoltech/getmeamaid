@@ -4,7 +4,7 @@ import { getMysql } from '@/lib/mysql';
 export const dynamic = 'force-dynamic';
 
 const KNOWN_TABLES = [
-  'app_users',
+  'users',
   'services',
   'addons',
   'pricing_rules',
@@ -24,7 +24,8 @@ const KNOWN_TABLES = [
   'cms_content',
   'service_pricing_rules',
   'roles',
-  'staff'
+  'permissions',
+  'role_permissions'
 ];
 
 export async function GET(req: NextRequest) {
@@ -89,15 +90,18 @@ export async function GET(req: NextRequest) {
 
     // Build lists of active and missing foreign key constraints
     const expectedForeignKeys = [
-      { constraint_name: 'orders_user_id_fkey', table_name: 'orders', referenced_table: 'app_users' },
+      { constraint_name: 'orders_user_id_fkey', table_name: 'orders', referenced_table: 'users' },
       { constraint_name: 'orders_service_id_fkey', table_name: 'orders', referenced_table: 'services' },
       { constraint_name: 'order_status_history_order_id_fkey', table_name: 'order_status_history', referenced_table: 'orders' },
-      { constraint_name: 'tickets_user_id_fkey', table_name: 'tickets', referenced_table: 'app_users' },
+      { constraint_name: 'tickets_user_id_fkey', table_name: 'tickets', referenced_table: 'users' },
       { constraint_name: 'tickets_order_id_fkey', table_name: 'tickets', referenced_table: 'orders' },
       { constraint_name: 'ticket_replies_ticket_id_fkey', table_name: 'ticket_replies', referenced_table: 'tickets' },
-      { constraint_name: 'password_tokens_user_id_fkey', table_name: 'password_tokens', referenced_table: 'app_users' },
+      { constraint_name: 'password_tokens_user_id_fkey', table_name: 'password_tokens', referenced_table: 'users' },
       { constraint_name: 'service_pricing_rules_service_id_fkey', table_name: 'service_pricing_rules', referenced_table: 'services' },
-      { constraint_name: 'service_pricing_rules_pricing_rule_id_fkey', table_name: 'service_pricing_rules', referenced_table: 'pricing_rules' }
+      { constraint_name: 'service_pricing_rules_pricing_rule_id_fkey', table_name: 'service_pricing_rules', referenced_table: 'pricing_rules' },
+      { constraint_name: 'users_role_id_fkey', table_name: 'users', referenced_table: 'roles' },
+      { constraint_name: 'role_permissions_role_id_fkey', table_name: 'role_permissions', referenced_table: 'roles' },
+      { constraint_name: 'role_permissions_permission_id_fkey', table_name: 'role_permissions', referenced_table: 'permissions' }
     ];
 
     let actualForeignKeys: any[] = [];
@@ -145,7 +149,7 @@ function generateSqlScript(): string {
 -- ==========================================
 -- This script safely drops ALL existing tables in dependency-cascade order,
 -- and recreates them with EXACT compatibility.
--- All table IDs use matched TEXT definitions to resolve key-constraint errors.
+-- All table IDs use numeric primary keys where requested.
 --
 -- INSTRUCTIONS:
 -- 1. Open HeidiSQL or your preferred local MySQL client.
@@ -153,18 +157,21 @@ function generateSqlScript(): string {
 -- 3. Open a "New Query" tab, paste this entire script, and click "Run" (F9).
 -- 4. Reload your application database settings or sync page to verify health.
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- ==========================================
--- STEP 1: DROP TABLES (IN REVERSE DEPENDENCY ORDER)
+-- STEP 1: DROP TABLES
 -- ==========================================
-DROP TABLE IF EXISTS staff;
-DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS service_pricing_rules;
+DROP TABLE IF EXISTS role_permissions;
+DROP TABLE IF EXISTS permissions;
 DROP TABLE IF EXISTS ticket_replies;
 DROP TABLE IF EXISTS tickets;
 DROP TABLE IF EXISTS order_status_history;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS password_tokens;
-DROP TABLE IF EXISTS app_users;
+DROP TABLE IF EXISTS service_pricing_rules;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS addons;
 DROP TABLE IF EXISTS pricing_rules;
@@ -179,434 +186,441 @@ DROP TABLE IF EXISTS gift_cards;
 DROP TABLE IF EXISTS cms_content;
 
 -- ==========================================
--- STEP 2: CREATE INDEPENDENT SCHEMA TABLES
+-- STEP 2: CREATE SCHEMA TABLES
 -- ==========================================
 
--- 1. Create app_users table
-CREATE TABLE app_users (
-    id VARCHAR(255) PRIMARY KEY,
-    name TEXT,
-    email VARCHAR(255) UNIQUE,
-    phone TEXT,
-    password_hash TEXT,
-    account_source TEXT DEFAULT 'signup',
-    email_verified_at DATETIME,
-    is_admin BOOLEAN DEFAULT false,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 2. Create services table
-CREATE TABLE services (
-    id VARCHAR(255) PRIMARY KEY,
-    title TEXT NOT NULL,
-    slug VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT,
-    image TEXT,
-    base_price NUMERIC(10,2) DEFAULT 0,
-    is_active BOOLEAN DEFAULT true,
-    is_manual_quote BOOLEAN DEFAULT false,
-    included_items TEXT, -- JSON Array Text
-    excluded_items TEXT, -- JSON Array Text
-    is_featured BOOLEAN DEFAULT false,
-    is_instant_pricing_enabled BOOLEAN DEFAULT true,
-    display_order INTEGER DEFAULT 0,
-    full_description TEXT,
-    faqs TEXT, -- JSON Array Text
-    notes TEXT,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- Ensure columns exist if schema is already created
-ALTER TABLE services ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
-ALTER TABLE services ADD COLUMN IF NOT EXISTS is_instant_pricing_enabled BOOLEAN DEFAULT true;
-ALTER TABLE services ADD COLUMN IF NOT EXISTS display_order INTEGER DEFAULT 0;
-ALTER TABLE services ADD COLUMN IF NOT EXISTS full_description TEXT;
-ALTER TABLE services ADD COLUMN IF NOT EXISTS faqs TEXT;
-ALTER TABLE services ADD COLUMN IF NOT EXISTS notes TEXT;
-
--- 3. Create addons table
-CREATE TABLE addons (
-    id VARCHAR(255) PRIMARY KEY,
-    service_id TEXT, -- Empty matches all or reference. TEXT for code srv-xxx ids
-    name TEXT NOT NULL,
-    price NUMERIC(10,2) DEFAULT 0,
-    pricing_type TEXT DEFAULT 'fixed',
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 4. Create pricing_rules table
-CREATE TABLE pricing_rules (
-    id VARCHAR(255) PRIMARY KEY,
-    service_id TEXT, -- empty means global
-    rule_type TEXT, -- residence_type, bedroom_count, bathroom_count, occupancy, etc
-    rule_name TEXT,
-    value TEXT,
-    price_adjustment NUMERIC(10,2) DEFAULT 0,
-    adjustment_type TEXT DEFAULT 'fixed',
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 5. Create coupons table
-CREATE TABLE coupons (
-    id VARCHAR(255) PRIMARY KEY,
-    code VARCHAR(255) UNIQUE NOT NULL,
-    name TEXT,
-    discount_type TEXT DEFAULT 'fixed',
-    discount_value NUMERIC(10,2) DEFAULT 0,
-    minimum_order_value NUMERIC(10,2) DEFAULT 0,
-    maximum_discount NUMERIC(10,2) DEFAULT 0,
-    applicable_services TEXT, -- JSON Array service IDs
-    start_date TEXT,
-    end_date TEXT,
-    total_usage_limit INTEGER DEFAULT 0,
-    per_customer_usage_limit INTEGER DEFAULT 1,
-    used_count INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 6. Create enquiries table
-CREATE TABLE enquiries (
-    id VARCHAR(255) PRIMARY KEY,
-    name TEXT,
-    email TEXT,
-    phone TEXT,
-    message TEXT,
-    status TEXT DEFAULT 'New',
-    created_at DATETIME DEFAULT now()
-);
-
--- 7. Create email_templates table
-CREATE TABLE email_templates (
-    id VARCHAR(255) PRIMARY KEY,
-    name TEXT,
-    subject TEXT,
-    body TEXT
-);
-
--- 8. Create email_logs table
-CREATE TABLE email_logs (
-    id VARCHAR(255) PRIMARY KEY,
-    to_email TEXT,
-    subject TEXT,
-    body TEXT,
-    sent_at DATETIME DEFAULT now()
-);
-
--- 9. Create slots table
-CREATE TABLE slots (
-    id VARCHAR(255) PRIMARY KEY,
-    name TEXT NOT NULL,
-    is_active BOOLEAN DEFAULT true
-);
-
--- 10. Create blocked_dates table
-CREATE TABLE blocked_dates (
-    id VARCHAR(255) PRIMARY KEY,
-    blocked_date TEXT NOT NULL
-);
-
--- 11. Create Bookings table 
-CREATE TABLE bookings (
-  id VARCHAR(255) PRIMARY KEY,
-  postal_code TEXT,
-  home_type TEXT,
-  bedrooms INTEGER DEFAULT 1,
-  bathrooms INTEGER DEFAULT 1,
-  square_footage INTEGER,
-  restoration_level TEXT,
-  frequency TEXT,
-  addons TEXT, -- JSON Array string
-  selected_date TEXT,
-  selected_time_slot TEXT,
-  entry_method TEXT,
-  custom_key_notes TEXT,
-  customer_special_notes TEXT,
-  first_name TEXT,
-  last_name TEXT,
-  email TEXT,
-  phone TEXT,
-  card_name TEXT,
-  pricing TEXT, -- JSON Object string
-  status TEXT DEFAULT 'Confirmed',
-  created_at DATETIME DEFAULT now()
-);
-
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Confirmed';
-
--- 12. Create Gift Cards table
-CREATE TABLE gift_cards (
-  id VARCHAR(255) PRIMARY KEY,
-  amount NUMERIC NOT NULL,
-  from_name TEXT NOT NULL,
-  to_name TEXT NOT NULL,
-  recipient_email TEXT NOT NULL,
-  created_at DATETIME DEFAULT now()
-);
-
--- 13. Create CMS Content table
-CREATE TABLE cms_content (
-  id VARCHAR(255) PRIMARY KEY,
-  content JSONB NOT NULL,
-  created_at DATETIME DEFAULT now(),
-  updated_at DATETIME DEFAULT now()
-);
-
--- ==========================================
--- STEP 3: CREATE DELEGEE SCHEMA TABLES (WITH CONSTRAINTS)
--- ==========================================
-
--- 14. Create orders table (uses app_users.id and services.id)
-CREATE TABLE orders (
-    id VARCHAR(255) PRIMARY KEY,
-    user_id TEXT REFERENCES app_users(id) ON DELETE SET NULL,
-    order_number VARCHAR(255) UNIQUE NOT NULL,
-    customer_name TEXT,
-    email TEXT,
-    phone TEXT,
-    service_id TEXT REFERENCES services(id) ON DELETE SET NULL,
-    property_size TEXT, -- JSON Object
-    selected_addons TEXT, -- JSON Array
-    preferred_date TEXT,
-    preferred_time_slot TEXT,
-    notes TEXT,
-    access_method TEXT,
-    custom_key_notes TEXT,
-    original_estimated_price NUMERIC(10,2) DEFAULT 0,
-    coupon_code TEXT,
-    discount_amount NUMERIC(10,2) DEFAULT 0,
-    final_estimated_price NUMERIC(10,2) DEFAULT 0,
-    final_confirmed_price NUMERIC(10,2),
-    payment_status TEXT, -- 'Unpaid', 'Paid', etc.
-    order_status TEXT, -- 'New', 'Completed', etc.
-    settlement_status TEXT,
-    admin_internal_notes TEXT,
-    customer_visible_notes TEXT,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 15. Create order_status_history table
-CREATE TABLE order_status_history (
-    id VARCHAR(255) PRIMARY KEY,
-    order_id TEXT REFERENCES orders(id) ON DELETE CASCADE,
-    old_status TEXT,
-    new_status TEXT,
-    changed_by TEXT,
-    note TEXT,
-    created_at DATETIME DEFAULT now()
-);
-
--- 16. Create tickets table
-CREATE TABLE tickets (
-    id VARCHAR(255) PRIMARY KEY,
-    ticket_number VARCHAR(255) UNIQUE NOT NULL,
-    user_id TEXT REFERENCES app_users(id) ON DELETE SET NULL,
-    order_id TEXT REFERENCES orders(id) ON DELETE SET NULL,
-    category TEXT,
-    subject TEXT,
-    message TEXT,
-    priority TEXT DEFAULT 'Medium',
-    status TEXT DEFAULT 'Open',
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 17. Create ticket_replies table
-CREATE TABLE ticket_replies (
-    id VARCHAR(255) PRIMARY KEY,
-    ticket_id TEXT REFERENCES tickets(id) ON DELETE CASCADE,
-    sender_type TEXT NOT NULL,
-    sender_id TEXT NOT NULL,
-    message TEXT NOT NULL,
-    attachment TEXT,
-    created_at DATETIME DEFAULT now()
-);
-
--- 18. Create password_tokens table
-CREATE TABLE password_tokens (
-    id VARCHAR(255) PRIMARY KEY,
-    user_id TEXT REFERENCES app_users(id) ON DELETE CASCADE,
-    token VARCHAR(255) UNIQUE NOT NULL,
-    type TEXT NOT NULL,
-    expires_at DATETIME NOT NULL,
-    used_at DATETIME,
-    created_at DATETIME DEFAULT now()
-);
-
--- 19. Create service_pricing_rules table (mapping table)
--- Resolves the TEXT/UUID incompatibilities perfectly by aligning matching primary key TEXT definitions
-CREATE TABLE service_pricing_rules (
-    id VARCHAR(255) PRIMARY KEY,
-    service_id TEXT REFERENCES services(id) ON DELETE CASCADE,
-    pricing_rule_id TEXT REFERENCES pricing_rules(id) ON DELETE CASCADE,
-    is_required BOOLEAN DEFAULT false,
-    default_selected BOOLEAN DEFAULT false,
-    display_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
-);
-
--- 20. Create roles table
+-- 1. Create roles table
 CREATE TABLE roles (
-    id VARCHAR(255) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    permissions TEXT,
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 21. Create staff table
-CREATE TABLE staff (
-    id VARCHAR(255) PRIMARY KEY,
+-- 2. Create permissions table
+CREATE TABLE permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Create role_permissions pivot table
+CREATE TABLE role_permissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    UNIQUE KEY role_permission_unique (role_id, permission_id),
+    CONSTRAINT role_permissions_role_id_fkey FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+    CONSTRAINT role_permissions_permission_id_fkey FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE
+);
+
+
+-- 4. Create users table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(255),
-    role_id VARCHAR(255),
-    is_active BOOLEAN DEFAULT true,
-    created_at DATETIME DEFAULT now(),
-    updated_at DATETIME DEFAULT now()
+    password_hash VARCHAR(255),
+    role_id INT,
+    account_source VARCHAR(255) DEFAULT 'signup',
+    email_verified_at DATETIME,
+    is_active TINYINT(1) DEFAULT 1,
+    is_admin TINYINT(1) DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
+);
+
+-- 5. Create services table
+CREATE TABLE services (
+    id VARCHAR(255) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description TEXT,
+    image TEXT,
+    base_price DECIMAL(10,2) DEFAULT 0.00,
+    is_active TINYINT(1) DEFAULT 1,
+    is_manual_quote TINYINT(1) DEFAULT 0,
+    included_items TEXT, -- JSON Array Text
+    excluded_items TEXT, -- JSON Array Text
+    is_featured TINYINT(1) DEFAULT 0,
+    is_instant_pricing_enabled TINYINT(1) DEFAULT 1,
+    display_order INT DEFAULT 0,
+    full_description TEXT,
+    faqs TEXT, -- JSON Array Text
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 6. Create addons table
+CREATE TABLE addons (
+    id VARCHAR(255) PRIMARY KEY,
+    service_id VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    pricing_type VARCHAR(255) DEFAULT 'fixed',
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 7. Create pricing_rules table
+CREATE TABLE pricing_rules (
+    id VARCHAR(255) PRIMARY KEY,
+    service_id VARCHAR(255),
+    rule_type VARCHAR(255), -- residence_type, bedroom_count, etc
+    rule_name VARCHAR(255),
+    value VARCHAR(255),
+    price_adjustment DECIMAL(10,2) DEFAULT 0.00,
+    adjustment_type VARCHAR(255) DEFAULT 'fixed',
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 8. Create coupons table
+CREATE TABLE coupons (
+    id VARCHAR(255) PRIMARY KEY,
+    code VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    discount_type VARCHAR(255) DEFAULT 'fixed',
+    discount_value DECIMAL(10,2) DEFAULT 0.00,
+    minimum_order_value DECIMAL(10,2) DEFAULT 0.00,
+    maximum_discount DECIMAL(10,2) DEFAULT 0.00,
+    applicable_services TEXT, -- JSON Array service IDs
+    start_date VARCHAR(255),
+    end_date VARCHAR(255),
+    total_usage_limit INT DEFAULT 0,
+    per_customer_usage_limit INT DEFAULT 1,
+    used_count INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 9. Create enquiries table
+CREATE TABLE enquiries (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(255),
+    message TEXT,
+    status VARCHAR(255) DEFAULT 'New',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10. Create email_templates table
+CREATE TABLE email_templates (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255),
+    subject VARCHAR(255),
+    body TEXT,
+    is_active TINYINT(1) DEFAULT 1
+);
+
+-- 11. Create email_logs table
+CREATE TABLE email_logs (
+    id VARCHAR(255) PRIMARY KEY,
+    to_email VARCHAR(255),
+    subject VARCHAR(255),
+    body TEXT,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    email_type VARCHAR(191),
+    recipient_email VARCHAR(191),
+    related_entity_id VARCHAR(191),
+    template_used VARCHAR(191),
+    sent_by VARCHAR(191),
+    status VARCHAR(191),
+    error_message TEXT
+);
+
+-- 12. Create slots table
+CREATE TABLE slots (
+    id VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    is_active TINYINT(1) DEFAULT 1
+);
+
+-- 13. Create blocked_dates table
+CREATE TABLE blocked_dates (
+    id VARCHAR(255) PRIMARY KEY,
+    blocked_date VARCHAR(255) NOT NULL
+);
+
+-- 14. Create Bookings table 
+CREATE TABLE bookings (
+  id VARCHAR(255) PRIMARY KEY,
+  postal_code VARCHAR(255),
+  home_type VARCHAR(255),
+  bedrooms INT DEFAULT 1,
+  bathrooms INT DEFAULT 1,
+  square_footage INT,
+  restoration_level VARCHAR(255),
+  frequency VARCHAR(255),
+  addons TEXT, -- JSON Array string
+  selected_date VARCHAR(255),
+  selected_time_slot VARCHAR(255),
+  entry_method VARCHAR(255),
+  custom_key_notes TEXT,
+  customer_special_notes TEXT,
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
+  email VARCHAR(255),
+  phone VARCHAR(255),
+  card_name VARCHAR(255),
+  pricing TEXT, -- JSON Object string
+  status VARCHAR(255) DEFAULT 'Confirmed',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  payment_status VARCHAR(191),
+  assigned_staff_id VARCHAR(191),
+  job_instructions TEXT,
+  confirmed_date VARCHAR(191),
+  confirmed_time VARCHAR(191),
+  staff_job_status VARCHAR(191),
+  internal_notes TEXT,
+  customer_visible_notes TEXT
+);
+
+-- 15. Create Gift Cards table
+CREATE TABLE gift_cards (
+  id VARCHAR(255) PRIMARY KEY,
+  amount DECIMAL(10,2) NOT NULL,
+  from_name VARCHAR(255) NOT NULL,
+  to_name VARCHAR(255) NOT NULL,
+  recipient_email VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 16. Create CMS Content table
+CREATE TABLE cms_content (
+  id VARCHAR(255) PRIMARY KEY,
+  content JSON NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 17. Create orders table
+CREATE TABLE orders (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id INT,
+    order_number VARCHAR(255) UNIQUE NOT NULL,
+    customer_name VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(255),
+    service_id VARCHAR(255),
+    property_size TEXT, -- JSON Object
+    selected_addons TEXT, -- JSON Array
+    preferred_date VARCHAR(255),
+    preferred_time_slot VARCHAR(255),
+    notes TEXT,
+    access_method VARCHAR(255),
+    custom_key_notes TEXT,
+    original_estimated_price DECIMAL(10,2) DEFAULT 0.00,
+    coupon_code VARCHAR(255),
+    discount_amount DECIMAL(10,2) DEFAULT 0.00,
+    final_estimated_price DECIMAL(10,2) DEFAULT 0.00,
+    final_confirmed_price DECIMAL(10,2),
+    payment_status VARCHAR(255),
+    order_status VARCHAR(255),
+    settlement_status VARCHAR(255),
+    admin_internal_notes TEXT,
+    customer_visible_notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT orders_service_id_fkey FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL
+);
+
+-- 18. Create order_status_history table
+CREATE TABLE order_status_history (
+    id VARCHAR(255) PRIMARY KEY,
+    order_id VARCHAR(255),
+    old_status VARCHAR(255),
+    new_status VARCHAR(255),
+    changed_by VARCHAR(255),
+    note TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT order_status_history_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+);
+
+-- 19. Create tickets table
+CREATE TABLE tickets (
+    id VARCHAR(255) PRIMARY KEY,
+    ticket_number VARCHAR(255) UNIQUE NOT NULL,
+    user_id INT,
+    order_id VARCHAR(255),
+    category VARCHAR(255),
+    subject VARCHAR(255),
+    message TEXT,
+    priority VARCHAR(255) DEFAULT 'Medium',
+    status VARCHAR(255) DEFAULT 'Open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT tickets_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT tickets_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+);
+
+-- 20. Create ticket_replies table
+CREATE TABLE ticket_replies (
+    id VARCHAR(255) PRIMARY KEY,
+    ticket_id VARCHAR(255),
+    sender_type VARCHAR(255) NOT NULL,
+    sender_id VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    attachment VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ticket_replies_ticket_id_fkey FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE
+);
+
+-- 21. Create password_tokens table
+CREATE TABLE password_tokens (
+    id VARCHAR(255) PRIMARY KEY,
+    user_id INT,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT password_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 22. Create service_pricing_rules table
+CREATE TABLE service_pricing_rules (
+    id VARCHAR(255) PRIMARY KEY,
+    service_id VARCHAR(255),
+    pricing_rule_id VARCHAR(255),
+    is_required TINYINT(1) DEFAULT 0,
+    default_selected TINYINT(1) DEFAULT 0,
+    display_order INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT service_pricing_rules_service_id_fkey FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+    CONSTRAINT service_pricing_rules_pricing_rule_id_fkey FOREIGN KEY (pricing_rule_id) REFERENCES pricing_rules(id) ON DELETE CASCADE
 );
 
 -- ==========================================
 -- STEP 4: SEED INITIAL DATA RECORDS
 -- ==========================================
 
--- Seed app_users
-INSERT INTO app_users (id, name, email, phone, password_hash, account_source, email_verified_at, is_admin) VALUES
-('usr-admin', 'Pristine Atelier Admin', 'curator@pristineeditorial.com', '+1 (416) 555-0100', 'admin', 'signup', NOW(), true),
-('usr-user1', 'Jean-Paul Leclerc', 'j.leclerc@gmail.com', '+1 (416) 555-0149', 'user123', 'signup', NOW(), false)
-ON CONFLICT (id) DO NOTHING;
+-- Seed permissions
+INSERT INTO permissions (id, name) VALUES
+(1, 'view_orders'),
+(2, 'edit_orders'),
+(3, 'update_order_status'),
+(4, 'assign_jobs'),
+(5, 'view_customers'),
+(6, 'manage_services'),
+(7, 'manage_pricing'),
+(8, 'manage_coupons'),
+(9, 'view_reports'),
+(10, 'download_invoices'),
+(11, 'manage_tickets'),
+(12, 'manage_staff'),
+(13, 'manage_roles'),
+(14, 'manage_email_templates'),
+(15, 'view_staff_jobs'),
+(16, 'view_dashboard'),
+(17, 'view_slots'),
+(18, 'manage_cms'),
+(19, 'manage_settings')
+ON DUPLICATE KEY UPDATE id=id;
+
+-- Seed roles
+INSERT INTO roles (id, name, is_active) VALUES
+(1, 'Super Admin', 1),
+(2, 'Manager', 1),
+(3, 'Support Staff', 1),
+(4, 'Field Staff', 1),
+(5, 'Accounts Staff', 1)
+ON DUPLICATE KEY UPDATE id=id;
+
+-- Seed role_permissions pivot mapping
+INSERT INTO role_permissions (role_id, permission_id) VALUES
+-- Super Admin (gets all 1-19)
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19),
+-- Manager (gets 1-11, plus dashboard 16 and slots 17)
+(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 10), (2, 11), (2, 16), (2, 17),
+-- Support Staff (view_orders, edit_orders, update_order_status, manage_tickets, manage_coupons, view_dashboard, view_slots)
+(3, 1), (3, 2), (3, 3), (3, 8), (3, 11), (3, 16), (3, 17),
+-- Field Staff (view_staff_jobs, view_customers)
+(4, 15), (4, 5),
+-- Accounts Staff (view_orders, update_order_status, view_reports, download_invoices, view_dashboard)
+(5, 1), (5, 3), (5, 9), (5, 10), (5, 16)
+ON DUPLICATE KEY UPDATE role_id=role_id;
+
+-- Seed users
+INSERT INTO users (id, name, email, phone, password_hash, role_id, account_source, email_verified_at, is_admin, is_active) VALUES
+(1, 'Pristine Atelier Admin', 'admin@gmail.com', '+1 (416) 555-0100', '$2b$10$uMR2Js.0TDTFDoJgDBmGKOwtJN5uy6apahpgVguo8bF/WfBP2.RCq', 1, 'signup', NOW(), 1, 1),
+(101, 'Arthur Pendelton', 'arthur@pristine.com', '+1 (416) 555-0101', '$2b$10$RucF42j3vtCvBuLScfSo7udIlrERaksxwcBG1j.OqN0nr0bzNrZ9u', 4, 'signup', NOW(), 0, 1),
+(102, 'Jessica Vance', 'jessica@pristine.com', '+1 (416) 555-0102', '$2b$10$wrlNPTFbJgj8yu4haWw7QujVWUcV4VsNUD6.Ty70O.wQLjQF43aAq', 4, 'signup', NOW(), 0, 1),
+(103, 'Michael Chen', 'michael@pristine.com', '+1 (416) 555-0103', '$2b$10$gueOvzLe8oVwBaNPrg3hP.Zfiq2Sfl9d20AUHo6HJQD6h2oiVwVq2', 2, 'signup', NOW(), 0, 1),
+(104, 'Sarah Connor', 'sarah@pristine.com', '+1 (416) 555-0104', '$2b$10$6AetMH3bGUGhHoBvBFYk.O8yPtwrx3tjuqu8BqlPYkin64qC4Q0a2', 3, 'signup', NOW(), 0, 1),
+(201, 'Jean-Paul Leclerc', 'j.leclerc@gmail.com', '+1 (416) 555-0149', 'user123', NULL, 'signup', NOW(), 0, 1)
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed services
 INSERT INTO services (id, title, slug, description, image, base_price, is_active, is_manual_quote, included_items, excluded_items) VALUES
-('srv-standard', 'Standard Maintenance Curation', 'standard-maintenance', 'A meticulous maintenance sweeps encompassing dusting, bespoke organizing, systematic vacuuming, sanitizing high-touch surfaces, and precision bathroom polishing.', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800', 1000.00, true, false, '["Sweeping, mopping, and vacuuming all floor layers","Fine-bristle hand dusting of high-fidelity frames, shelving, and surfaces","Full kitchen exterior sanitization & deep range-hood degreasing","Deep bath/shower chrome polishing and glass micro-wipe","Linen changes & bespoke textile precision alignments"]', '["Deep lime or mold grout remediation","Vents interior shaft vacuum extraction","Inside oven or inside refrigerator (available as Add-on only)","Empty drawer/closet vacuum clearances (unless Move-In requested)"]'),
-('srv-deep', 'Deep Restoration Suite', 'deep-cleaning', 'An exhaustive physical overhaul targeting cumulative dust, deep lime and mold remediation, vents detailing, grout deep scrubbing, window-interior polishing, and inside-appliance curations based on diagnostic requirements.', 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&q=80&w=800', 2500.00, true, false, '["All Standard Maintenance inclusion items","Inside of oven and oven-hood structural grease extraction","Inside refrigerator detailed shelving scrub & fresh sterilization","100% steam localized bath grout sanitization","Detailed hand-wiping of doors, trims, frames, and wide baseboards","Interior dry-vacuuming of heating vents and filter plates"]', '["Chandelier deep glass crystal removal and dismantling","Heavy debris, commercial trash, or post-construction paint stripping"]'),
-('srv-move', 'Move In / Out Choreography', 'move-in-out', 'Designed for buyers, renters, and listing agents. We curate complete vertical extraction, empty drawer disinfection, inside all shelves, drawers, cabinets, closet resets.', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800', 3500.00, true, false, '["Complete empty home bottom-to-ceiling vertical sweep","Vacuuming, wiping, and sterilizing all inside closets, drawers, and cabinetry","Complete structural reset of luxury appliances (Oven, Fridge, Dishwasher, Microwave)","Deep tracking detail of window sliders & glass panes","Precision spot-cleaning of walls, staircases rails, and baseboards"]', '["Exterior window washers requiring scaffolding or ladders","Post-flood mold restorations"]')
-ON CONFLICT (id) DO NOTHING;
+('srv-standard', 'Standard Maintenance Curation', 'standard-maintenance', 'A meticulous maintenance sweeps encompassing dusting, bespoke organizing, systematic vacuuming, sanitizing high-touch surfaces, and precision bathroom polishing.', 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800', 1000.00, 1, 0, '["Sweeping, mopping, and vacuuming all floor layers","Fine-bristle hand dusting of high-fidelity frames, shelving, and surfaces","Full kitchen exterior sanitization & deep range-hood degreasing","Deep bath/shower chrome polishing and glass micro-wipe","Linen changes & bespoke textile precision alignments"]', '["Deep lime or mold grout remediation","Vents interior shaft vacuum extraction","Inside oven or inside refrigerator (available as Add-on only)","Empty drawer/closet vacuum clearances (unless Move-In requested)"]'),
+('srv-deep', 'Deep Restoration Suite', 'deep-cleaning', 'An exhaustive physical overhaul targeting cumulative dust, deep lime and mold remediation, vents detailing, grout deep scrubbing, window-interior polishing, and inside-appliance curations based on diagnostic requirements.', 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&q=80&w=800', 2500.00, 1, 0, '["All Standard Maintenance inclusion items","Inside of oven and oven-hood structural grease extraction","Inside refrigerator detailed shelving scrub & fresh sterilization","100% steam localized bath grout sanitization","Detailed hand-wiping of doors, trims, frames, and wide baseboards","Interior dry-vacuuming of heating vents and filter plates"]', '["Chandelier deep glass crystal removal and dismantling","Heavy debris, commercial trash, or post-construction paint stripping"]'),
+('srv-move', 'Move In / Out Choreography', 'move-in-out', 'Designed for buyers, renters, and listing agents. We curate complete vertical extraction, empty drawer disinfection, inside all shelves, drawers, cabinets, closet resets.', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800', 3500.00, 1, 0, '["Complete empty home bottom-to-ceiling vertical sweep","Vacuuming, wiping, and sterilizing all inside closets, drawers, and cabinetry","Complete structural reset of luxury appliances (Oven, Fridge, Dishwasher, Microwave)","Deep tracking detail of window sliders & glass panes","Precision spot-cleaning of walls, staircases rails, and baseboards"]', '["Exterior window washers requiring scaffolding or ladders","Post-flood mold restorations"]')
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed slots
 INSERT INTO slots (id, name, is_active) VALUES
-('sl-morning', '09:00 AM - 12:00 PM (Morning Slot)', true),
-('sl-afternoon', '12:00 PM - 03:00 PM (Afternoon Slot)', true),
-('sl-evening', '03:00 PM - 06:00 PM (Evening Slot)', true),
-('sl-twilight', '06:00 PM - 09:00 PM (Twilight Care)', true)
-ON CONFLICT (id) DO NOTHING;
+('sl-morning', '09:00 AM - 12:00 PM (Morning Slot)', 1),
+('sl-afternoon', '12:00 PM - 03:00 PM (Afternoon Slot)', 1),
+('sl-evening', '03:00 PM - 06:00 PM (Evening Slot)', 1),
+('sl-twilight', '06:00 PM - 09:00 PM (Twilight Care)', 1)
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed addons
 INSERT INTO addons (id, service_id, name, price, pricing_type, is_active) VALUES
-('add-fridge', '', 'Inside Refrigerator Detailing', 300.00, 'fixed', true),
-('add-oven', '', 'Inside Oven Degrease', 350.00, 'fixed', true),
-('add-cabinets', '', 'Inside Drawer & Cabinets', 500.00, 'fixed', true),
-('add-windows', '', 'All Interior Window Panes', 400.00, 'fixed', true),
-('add-pethair', '', 'Deep Pet Hair Allergen Extract', 450.00, 'fixed', true)
-ON CONFLICT (id) DO NOTHING;
+('add-fridge', '', 'Inside Refrigerator Detailing', 300.00, 'fixed', 1),
+('add-oven', '', 'Inside Oven Degrease', 350.00, 'fixed', 1),
+('add-cabinets', '', 'Inside Drawer & Cabinets', 500.00, 'fixed', 1),
+('add-windows', '', 'All Interior Window Panes', 400.00, 'fixed', 1),
+('add-pethair', '', 'Deep Pet Hair Allergen Extract', 450.00, 'fixed', 1)
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed pricing_rules
 INSERT INTO pricing_rules (id, service_id, rule_type, rule_name, value, price_adjustment, adjustment_type, is_active) VALUES
-('pr-res-condo', '', 'residence_type', 'Apartment / Condominium', 'Apartment / Condo', 0.00, 'fixed', true),
-('pr-res-house', '', 'residence_type', 'House / Estate Premium', 'House / Estate', 1000.00, 'fixed', true),
-('pr-res-town', '', 'residence_type', 'Townhouse / Duplex', 'Townhouse / Duplex', 500.00, 'fixed', true),
-('pr-res-office', '', 'residence_type', 'Office / Commercial', 'Office / Commercial', 1500.00, 'fixed', true),
-('pr-bed', '', 'bedroom_count', 'Per Bedroom Modification', 'bedroom', 250.00, 'fixed', true),
-('pr-bath', '', 'bathroom_count', 'Per Bathroom Modification', 'bathroom', 350.00, 'fixed', true),
-('pr-urg-same', '', 'urgency_charge', 'Same-Day Dispatch Charge', 'same_day', 20.00, 'percentage', true),
-('pr-urg-next', '', 'urgency_charge', 'Next-Day Priority Charge', 'next_day', 10.00, 'percentage', true),
-('pr-loc-normal', '', 'location_charge', 'Normal Service Zone', 'normal', 0.00, 'fixed', true),
-('pr-loc-out', '', 'location_charge', 'Outside Postal Zone', 'outside', 400.00, 'fixed', true),
-('pr-loc-far', '', 'location_charge', 'Far Boundary Hub', 'far', 1.00, 'percentage', true),
-('pr-min-order', '', 'min_order_value', 'Minimum Atelier Guarantee', '999', 999.00, 'fixed', true)
-ON CONFLICT (id) DO NOTHING;
+('pr-res-condo', '', 'residence_type', 'Apartment / Condominium', 'Apartment / Condo', 0.00, 'fixed', 1),
+('pr-res-house', '', 'residence_type', 'House / Estate Premium', 'House / Estate', 1000.00, 'fixed', 1),
+('pr-res-town', '', 'residence_type', 'Townhouse / Duplex', 'Townhouse / Duplex', 500.00, 'fixed', 1),
+('pr-res-office', '', 'residence_type', 'Office / Commercial', 'Office / Commercial', 1500.00, 'fixed', 1),
+('pr-bed', '', 'bedroom_count', 'Per Bedroom Modification', 'bedroom', 250.00, 'fixed', 1),
+('pr-bath', '', 'bathroom_count', 'Per Bathroom Modification', 'bathroom', 350.00, 'fixed', 1),
+('pr-urg-same', '', 'urgency_charge', 'Same-Day Dispatch Charge', 'same_day', 20.00, 'percentage', 1),
+('pr-urg-next', '', 'urgency_charge', 'Next-Day Priority Charge', 'next_day', 10.00, 'percentage', 1),
+('pr-loc-normal', '', 'location_charge', 'Normal Service Zone', 'normal', 0.00, 'fixed', 1),
+('pr-loc-out', '', 'location_charge', 'Outside Postal Zone', 'outside', 400.00, 'fixed', 1),
+('pr-loc-far', '', 'location_charge', 'Far Boundary Hub', 'far', 1.00, 'percentage', 1),
+('pr-min-order', '', 'min_order_value', 'Minimum Atelier Guarantee', '999', 999.00, 'fixed', 1)
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed coupons
 INSERT INTO coupons (id, code, name, discount_type, discount_value, minimum_order_value, maximum_discount, applicable_services, start_date, end_date, total_usage_limit, per_customer_usage_limit, used_count, is_active) VALUES
-('cp-welcome100', 'WELCOME100', 'Atelier Inauguration Discount', 'fixed', 100.00, 999.00, 100.00, '[]', '2026-01-01', '2030-12-31', 1000, 1, 5, true),
-('cp-spring15', 'SPRING15', 'Spring Renewal Suite Discount', 'percentage', 15.00, 2000.00, 1000.00, '[]', '2026-03-01', '2026-06-31', 500, 1, 2, true)
-ON CONFLICT (id) DO NOTHING;
+('cp-welcome100', 'WELCOME100', 'Atelier Inauguration Discount', 'fixed', 100.00, 999.00, 100.00, '[]', '2026-01-01', '2030-12-31', 1000, 1, 5, 1),
+('cp-spring15', 'SPRING15', 'Spring Renewal Suite Discount', 'percentage', 15.00, 2000.00, 1000.00, '[]', '2026-03-01', '2026-06-31', 500, 1, 2, 1)
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed main CMS content
 INSERT INTO cms_content (id, content) VALUES
-('main', '{"hero":{"heading":"Professional Cleaning Services You Can Depend On","subheading":"A systematic, clinical approach to restoration. Designed for modern living, budgeted dynamically, and calibrated in exquisite details for Toronto, Vancouver, and Calgary homes.","ctaText":"Book Curation Now","ctaLink":"/book","bannerImage":"https://images.unsplash.com/photo-1603796846097-bee99e4a60c9?auto=format&fit=crop&q=80&w=1200","status":"published"},"contact":{"phone":"+1 (800) 555-MAID (6243)","email":"concierge@getmeamaid.ca","area":"Metropolitan Toronto, Vancouver waterfront, Calgary Foothills","hours":"Monday - Sunday: 08:00 AM - 08:00 PM EST","mapLink":"https://maps.google.com","socials":{"twitter":"@getmeamaid","facebook":"getmeamaid.premium","instagram":"getmeamaid.curations"}},"footer":{"copyright":"© 2026 getmeamaid Labs. Absolute Luxury Curation.","desc":"Experience bespoke premium cleaning curation. Serving Toronto, Vancouver, and Calgary with an uncompromising standard of high-fidelity restoration."},"howItWorks":[{"id":"step-1","title":"Select Fine Details","description":"Toggle high-fidelity curation additions corresponding to spaces recursively.","display_order":1,"is_active":true},{"id":"step-2","title":"Verify Automatic Valuation","description":"Our instant math matches exact pricing breakdown transparency.","display_order":2,"is_active":true},{"id":"step-3","title":"Behold Immaculate Restoration","description":"Elite vetted specialists perform clinical-grade cleanings.","display_order":3,"is_active":true}],"testimonials":[{"id":"test-1","customer_name":"Charlotte Mercer","review_text":"Their Deep Restoration Curation is absolute magic. The baseboards, cabinet alignments, and lavender-sage scent selections made our high-rise condo look pristine as a surgical laboratory. Highly recommended.","rating":5,"display_order":1,"is_active":true},{"id":"test-2","customer_name":"Marcus Goldman","review_text":"Consistent, uncompromising quality. Standard maintenance program saves our townhouse incredible logistics load weekly. Vetted staff members present extraordinary standards.","rating":5,"display_order":2,"is_active":true}],"faqs":[{"id":"faq-1","question":"What is your high-fidelity restoration level difference?","answer":"Our signature deep restoration focuses on critical air purification, deep sanitizing of cabinets, clinical vent detailed wipes, and hand-polishing metals, surpassing traditional cleanings by several orders of volume.","display_order":1,"is_active":true},{"id":"faq-2","question":"How does the manual quote condition work?","answer":"For estates exceeding standard bedroom sizes or far zones, our backend calculator assigns high-touch manual indicators. We email final quotes within minutes of submit logs.","display_order":2,"is_active":true}],"terms":{"title":"Terms of Service Agreement","content":"All home reservations are subject to standard 24 hours cancellation policies. Security authorization forms clear payments upon dispatch schedule completions."},"privacy":{"title":"Privacy and Security Assurances","content":"Your home security lockbox parameters and physical property details are encrypted locally under TLS 1.3 standards. No telemetry details are ever shared with third-party servers."},"servicesContent":[{"id":"srv-standard","title":"Standard Maintenance Curation","rate":140,"duration":"2.5 - 4 Hours","desc":"A meticulous maintenance sweeps encompassing dusting, bespoke organizing, systematic vacuuming, sanitizing high-touch surfaces, and precision bathroom polishing.","highlights":["Scent choices: Fresh Herb or Citrus","Textile precision alignment","Double-polished metal faucets"],"is_active":true},{"id":"srv-deep","title":"Deep Restoration Suite","rate":210,"duration":"4 - 7 Hours","desc":"An exhaustive physical overhaul targeting cumulative dust, deep lime and mold remediation, vents detailing, grout deep scrubbing, window-interior polishing, and inside-appliance curations.","highlights":["Grout 100% steam cleaning","Vents detailing wipes","Localized extraction cleanings"],"is_active":true},{"id":"srv-move","title":"Move In / Out Choreography","rate":340,"duration":"5 - 9 Hours","desc":"Designed for buyers, renters, and listing agents. We curate complete vertical extraction, empty drawer disinfection, inside all shelves, drawers, cabinets, closet resets.","highlights":["Oven & Refrigerator detailing","Meticulous sanitization","Air purification sweep"],"is_active":true}],"seo":{"home":{"pageTitle":"Home","metaTitle":"getmeamaid | Bespoke Premium Cleaning Curations","metaDescription":"Elite home restoration and maintenance services throughout Toronto, Vancouver, and Calgary.","slug":"/"},"book":{"pageTitle":"Book Appointment","metaTitle":"Reserve Luxury Clean - getmeamaid","metaDescription":"Configure details and book instant home curators.","slug":"/book"}}}')
-ON CONFLICT (id) DO NOTHING;
+('main', '{"hero":{"heading":"Professional Cleaning Services You Can Depend On","subheading":"A systematic, clinical approach to restoration. Designed for modern living, budgeted dynamically, and calibrated in exquisite details for Toronto, Vancouver, and Calgary homes.","ctaText":"Book Curation Now","ctaLink":"/book","bannerImage":"https://images.unsplash.com/photo-1603796846097-bee99e4a60c9?auto=format&fit=crop&q=80&w=1200","status":"published"},"contact":{"phone":"+1 (800) 555-MAID (6243)","email":"concierge@getmeamaid.ca","area":"Metropolitan Toronto, Vancouver waterfront, Calgary Foothills","hours":"Monday - Sunday: 08:00 AM - 08:00 PM EST","mapLink":"https://maps.google.com","socials":{"twitter":"@getmeamaid","facebook":"getmeamaid.premium","instagram":"getmeamaid.curations"}},"footer":{"copyright":"© 2026 getmeamaid Labs. Absolute Luxury Curation.","desc":"Experience bespoke premium cleaning curation. Serving Toronto, Vancouver, and Calgary with an uncompromising standard of high-fidelity restoration."},"howItWorks":[{"id":"step-1","title":"Select Fine Details","description":"Toggle high-fidelity curation additions corresponding to spaces recursively.","display_order":1,"is_active":true},{"id":"step-2","title":"Verify Automatic Valuation","description":"Our math matches exact pricing breakdown transparency.","display_order":2,"is_active":true},{"id":"step-3","title":"Behold Immaculate Restoration","description":"Elite vetted specialists perform clinical-grade cleanings.","display_order":3,"is_active":true}],"testimonials":[{"id":"test-1","customer_name":"Charlotte Mercer","review_text":"Their Deep Restoration Curation is absolute magic. The baseboards, cabinet alignments, and lavender-sage scent selections made our high-rise condo look pristine as a surgical laboratory. Highly recommended.","rating":5,"display_order":1,"is_active":true},{"id":"test-2","customer_name":"Marcus Goldman","review_text":"Consistent, uncompromising quality. Standard maintenance program saves our townhouse incredible logistics load weekly. Vetted staff members present extraordinary standards.","rating":5,"display_order":2,"is_active":true}],"faqs":[{"id":"faq-1","question":"What is your high-fidelity restoration level difference?","answer":"Our deep restoration focuses on critical air purification, deep sanitizing of cabinets, clinical vent detailed wipes, and hand-polishing metals, surpassing traditional cleanings by several orders of volume.","display_order":1,"is_active":true},{"id":"faq-2","question":"How does the manual quote condition work?","answer":"For estates exceeding standard bedroom sizes or far zones, our backend calculator assigns high-touch manual indicators. We email final quotes within minutes of submit logs.","display_order":2,"is_active":true}],"terms":{"title":"Terms of Service Agreement","content":"All home reservations are subject to standard 24 hours cancellation policies. Security authorization forms clear payments upon dispatch schedule completions."},"privacy":{"title":"Privacy and Security Assurances","content":"Your home security lockbox parameters and physical property details are encrypted locally under TLS 1.3 standards. No telemetry details are ever shared with third-party servers."},"servicesContent":[{"id":"srv-standard","title":"Standard Maintenance Curation","rate":140,"duration":"2.5 - 4 Hours","desc":"A meticulous maintenance sweeps encompassing dusting, bespoke organizing, systematic vacuuming, sanitizing high-touch surfaces, and precision bathroom polishing.","highlights":["Scent choices: Fresh Herb or Citrus","Textile precision alignment","Double-polished metal faucets"],"is_active":true},{"id":"srv-deep","title":"Deep Restoration Suite","rate":210,"duration":"4 - 7 Hours","desc":"An overhaul targeting cumulative dust, deep lime and mold remediation, vents detailing, grout deep scrubbing, window-interior polishing, and inside-appliance curations.","highlights":["Grout 100% steam cleaning","Vents detailing wipes","Localized extraction cleanings"],"is_active":true},{"id":"srv-move","title":"Move In / Out Choreography","rate":340,"duration":"5 - 9 Hours","desc":"Designed for buyers, renters, and listing agents. We curate complete vertical extraction, empty drawer disinfection, inside all shelves, drawers, cabinets, closet resets.","highlights":["Oven & Refrigerator detailing","Meticulous sanitization","Air purification sweep"],"is_active":true}],"seo":{"home":{"pageTitle":"Home","metaTitle":"getmeamaid | Bespoke Premium Cleaning Curations","metaDescription":"Elite home restoration and maintenance services throughout Toronto, Vancouver, and Calgary.","slug":"/"},"book":{"pageTitle":"Book Appointment","metaTitle":"Reserve Luxury Clean - getmeamaid","metaDescription":"Configure details and book instant home curators.","slug":"/book"}}}'')
+ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed email_templates
-INSERT INTO email_templates (id, name, subject, body) VALUES
-('tpl-order-confirm', 'Order Confirmation', 'Your Pristine Atelier Dispatch Receipt [#{order_id}]', 'Hello {customer_name},\n\nWe have received your luxury maintenance request #{order_id} for a meticulously curated {service_name}.\n\nPreferred Date: {preferred_date}\nPreferred Time: {preferred_slot}\nOriginal Estimate Code: {final_price}\n\nOur curation team is currently reviewing your schedule request. We will finalize your slot allocations and deliver dispatch quotes promptly. Thank you for selecting The Pristine Editorial.\n\nWarm regards,\nThe Pristine Atelier Core'),
-('tpl-set-password', 'Set Password (Guest Auto)', 'Complete Your Pristine Atelier Account Setup', 'Hello {customer_name},\n\nWe created an account so you can track your order #{order_id} and raise support tickets with ease.\n\nPlease select the link below to configure your custom entry password securely within 24 hours:\n{payment_link}\n\nThank you,\nThe Pristine Core'),
-('tpl-quote-sent', 'Quote Sent', 'Your Customized Editorial Sweep Dispatch Quote [#{order_id}]', 'Hello {customer_name},\n\nOur team has reviewed your order #{order_id} for {service_name}.\n\nYour customized total dispatch price has been locked at {final_price}.\n\nPreferred Date: {preferred_date} ({preferred_slot})\n\nPlease finalize this dispatch block prior to our booking threshold by referencing instructions: {payment_link}\n\nWarmest regards,\nThe Pristine Editorial Team')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO email_templates (id, name, subject, body, is_active) VALUES
+('tpl-order-confirm', 'Order Confirmation', 'Your Pristine Atelier Dispatch Receipt [#{order_id}]', 'Hello {customer_name},\n\nWe have received your luxury maintenance request #{order_id} for a meticulously curated {service_name}.\n\nPreferred Date: {preferred_date}\nPreferred Time: {preferred_slot}\nOriginal Estimate Code: {final_price}\n\nOur curation team is currently reviewing your schedule request. We will finalize your slot allocations and deliver dispatch quotes promptly. Thank you for selecting The Pristine Editorial.\n\nWarm regards,\nThe Pristine Atelier Core', 1),
+('tpl-set-password', 'Set Password (Guest Auto)', 'Complete Your Pristine Atelier Account Setup', 'Hello {customer_name},\n\nWe created an account so you can track your order #{order_id} and raise support tickets with ease.\n\nPlease select the link below to configure your custom entry password securely within 24 hours:\n{payment_link}\n\nThank you,\nThe Pristine Core', 1),
+('tpl-quote-sent', 'Quote Sent', 'Your Customized Editorial Sweep Dispatch Quote [#{order_id}]', 'Hello {customer_name},\n\nOur team has reviewed your order #{order_id} for {service_name}.\n\nYour customized total dispatch price has been locked at {final_price}.\n\nPreferred Date: {preferred_date} ({preferred_slot})\n\nPlease finalize this dispatch block prior to our booking threshold by referencing instructions: {payment_link}\n\nWarmest regards,\nThe Pristine Editorial Team', 1)
+ON DUPLICATE KEY UPDATE id=id;
 
--- ==========================================
--- STEP 5: DISABLE ROW LEVEL SECURITY (RLS)
--- ==========================================
-ALTER TABLE IF EXISTS app_users DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS services DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS addons DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS pricing_rules DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS coupons DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS orders DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS order_status_history DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS tickets DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS ticket_replies DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS password_tokens DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS enquiries DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS email_templates DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS email_logs DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS slots DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS blocked_dates DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS bookings DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS gift_cards DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS cms_content DISABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS service_pricing_rules DISABLE ROW LEVEL SECURITY;
-
--- ==========================================
--- STEP 6: INTRODUCE INTEGRITY CHECK FUNCTIONS
--- ==========================================
--- Helper RPC to securely inspect tables and foreign key schemas via REST API
-CREATE OR REPLACE FUNCTION check_db_integrity()
-RETURNS JSONB
-SECURITY DEFINER
-AS $$
-DECLARE
-    result JSONB;
-BEGIN
-    SELECT json_build_object(
-        'tables', (
-            SELECT json_agg(t.table_name)
-            FROM information_schema.tables t
-            WHERE t.table_schema = 'public'
-        ),
-        'foreign_keys', (
-            SELECT json_agg(json_build_object(
-                'constraint_name', tc.constraint_name,
-                'table_name', tc.table_name,
-                'referenced_table', ccu.table_name
-            ))
-            FROM information_schema.table_constraints AS tc 
-            JOIN information_schema.key_column_usage AS kcu
-              ON tc.constraint_name = kcu.constraint_name
-              AND tc.table_schema = kcu.table_schema
-            JOIN information_schema.constraint_column_usage AS ccu
-              ON ccu.constraint_name = tc.constraint_name
-              AND ccu.table_schema = tc.table_schema
-            WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema = 'public'
-        )
-    ) INTO result;
-    RETURN result;
-END;
-$$ LANGUAGE plpgsql;
-
--- ==========================================
--- RE RESET COMPLETE
--- ==========================================
+SET FOREIGN_KEY_CHECKS = 1;
 `;
 }
+
