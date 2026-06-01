@@ -26,13 +26,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    saveCmsContent(body);
+    const cmsData = body.configuration || body;
+    saveCmsContent(cmsData);
     
     const mysqlClient = getMysql();
     if (mysqlClient) {
       await mysqlClient
         .from('cms_content')
-        .upsert({ id: 'main', content: body });
+        .upsert({ id: 'main', content: cmsData });
     }
     
     const updated = getCmsContent();

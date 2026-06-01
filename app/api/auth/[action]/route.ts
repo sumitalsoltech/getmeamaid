@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ action: 
       // Securely hash of password (simple plaintext/fallback hashing for simplicity, but complying with secure intent)
       // Let's store password directly as password_hash. In a real-world app it would use bcrypt, but here we keep it robust.
       const newUser: User = {
-        id: `usr-${Math.floor(100000 + Math.random() * 900000)}`,
+        id: Math.floor(100000 + Math.random() * 900000),
         name,
         email: normalizedEmail,
         phone,
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ action: 
         email_verified_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        is_admin: normalizedEmail.includes('admin') || normalizedEmail === 'curator@pristineeditorial.com'
+        is_admin: normalizedEmail.includes('admin') || normalizedEmail === 'admin@gmail.com'
       };
 
       db.users.push(newUser);
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ action: 
 
       // Log in automatically by returning user details
       const response = NextResponse.json({ success: true, user: { id: newUser.id, name: newUser.name, email: newUser.email, phone: newUser.phone, is_admin: newUser.is_admin } });
-      response.cookies.set('pristine_user_id', newUser.id, { path: '/', httpOnly: false, maxAge: 60 * 60 * 24 * 7 });
+      response.cookies.set('pristine_user_id', String(newUser.id), { path: '/', httpOnly: false, maxAge: 60 * 60 * 24 * 7 });
       return response;
     }
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest, props: { params: Promise<{ action: 
       }
 
       const response = NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email, phone: user.phone, is_admin: user.is_admin } });
-      response.cookies.set('pristine_user_id', user.id, { path: '/', httpOnly: false, maxAge: 60 * 60 * 24 * 7 });
+      response.cookies.set('pristine_user_id', String(user.id), { path: '/', httpOnly: false, maxAge: 60 * 60 * 24 * 7 });
       return response;
     }
 
@@ -166,7 +166,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ action: s
       return NextResponse.json({ user: null });
     }
 
-    const user = db.users.find(u => u.id === userIdCookie);
+    const user = db.users.find(u => String(u.id) === userIdCookie);
     if (!user) {
       const res = NextResponse.json({ user: null });
       res.cookies.delete('pristine_user_id');

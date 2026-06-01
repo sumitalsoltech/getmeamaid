@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { getMysql } from './mysql';
+import { getMysql, getPool } from './mysql';
 
 // File-based persistence path
 const DB_FILE_PATH = path.join('/tmp', 'pristine_db.json');
 const ALTERNATE_DB_FILE_PATH = path.join(process.cwd(), 'pristine_db.json');
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
@@ -17,7 +17,10 @@ export interface User {
   created_at: string;
   updated_at: string;
   is_admin?: boolean;
+  role_id?: number | null;
+  is_active?: boolean;
 }
+
 
 export interface Service {
   id: string;
@@ -78,7 +81,7 @@ export interface Coupon {
 
 export interface Order {
   id: string;
-  user_id: string;
+  user_id: number | null;
   order_number: string;
   customer_name: string;
   email: string;
@@ -128,7 +131,7 @@ export interface OrderStatusHistory {
 export interface Ticket {
   id: string;
   ticket_number: string;
-  user_id: string;
+  user_id: number | null;
   order_id?: string;
   category: 'Payment issue' | 'Scheduling issue' | 'Service issue' | 'Coupon issue' | 'Cancellation request' | 'Refund request' | 'Other';
   subject: string;
@@ -151,7 +154,7 @@ export interface TicketReply {
 
 export interface PasswordToken {
   id: string;
-  user_id: string;
+  user_id: number | null;
   token: string;
   type: 'set_password' | 'reset_password';
   expires_at: string;
@@ -191,18 +194,18 @@ export interface Slot {
 }
 
 export interface Role {
-  id: string;
+  id: number;
   name: string;
   permissions: string[];
   is_active: boolean;
 }
 
 export interface Staff {
-  id: string;
+  id: number;
   name: string;
   email: string;
   phone: string;
-  role_id: string;
+  role_id: number;
   is_active: boolean;
 }
 
@@ -233,7 +236,7 @@ const globalForDb = global as unknown as { pristineDb: DbSchema | null };
 const initialDb: DbSchema = {
   users: [
     {
-      id: "usr-admin",
+      id: 1,
       name: "Pristine Atelier Admin",
       email: "curator@pristineeditorial.com",
       phone: "+1 (416) 555-0100",
@@ -242,10 +245,11 @@ const initialDb: DbSchema = {
       email_verified_at: "2026-05-26T19:39:20Z",
       created_at: "2026-05-26T19:39:20Z",
       updated_at: "2026-05-26T19:39:20Z",
-      is_admin: true
+      is_admin: true,
+      role_id: 1
     },
     {
-      id: "usr-user1",
+      id: 201,
       name: "Jean-Paul Leclerc",
       email: "j.leclerc@gmail.com",
       phone: "+1 (416) 555-0149",
@@ -254,7 +258,8 @@ const initialDb: DbSchema = {
       email_verified_at: "2026-05-26T19:39:20Z",
       created_at: "2026-05-26T19:39:20Z",
       updated_at: "2026-05-26T19:39:20Z",
-      is_admin: false
+      is_admin: false,
+      role_id: null
     }
   ],
   services: [
@@ -393,7 +398,7 @@ const initialDb: DbSchema = {
   orders: [
     {
       id: "ord-829104",
-      user_id: "usr-user1",
+      user_id: 201,
       order_number: "PST-829104",
       customer_name: "Jean-Paul Leclerc",
       email: "j.leclerc@gmail.com",
@@ -452,7 +457,7 @@ const initialDb: DbSchema = {
     {
       id: "tkt-001",
       ticket_number: "TKT-590021",
-      user_id: "usr-user1",
+      user_id: 201,
       order_id: "ord-829104",
       category: "Scheduling issue",
       subject: "Coordinating concierges lift booking window",
@@ -650,10 +655,9 @@ export async function getDbAsync(): Promise<DbSchema> {
       emailLogsRes,
       slotsRes,
       blockedDatesRes,
-      rolesRes,
-      staffRes
+      rolesRes
     ] = await Promise.all([
-      mysqlClient.from('app_users').select('*'),
+      mysqlClient.from('users').select('*'),
       mysqlClient.from('services').select('*'),
       mysqlClient.from('addons').select('*'),
       mysqlClient.from('pricing_rules').select('*'),
@@ -668,11 +672,45 @@ export async function getDbAsync(): Promise<DbSchema> {
       mysqlClient.from('email_logs').select('*'),
       mysqlClient.from('slots').select('*'),
       mysqlClient.from('blocked_dates').select('*'),
-      mysqlClient.from('roles').select('*'),
-      mysqlClient.from('staff').select('*')
+      mysqlClient.from('roles').select('*')
     ]);
 
-    if (!usersRes.error && usersRes.data && usersRes.data.length > 0) db.users = usersRes.data;
+    // Query role permissions join table directly from pool
+    const pool = getPool();
+    const [rpRows] = await pool.query(`
+      SELECT rp.role_id, p.name AS permission_name 
+      FROM role_permissions rp
+      JOIN permissions p ON rp.permission_id = p.id
+    `);
+    const permissionsMap: Record<number, string[]> = {};
+    for (const row of (rpRows as any[])) {
+      const roleId = Number(row.role_id);
+      if (!permissionsMap[roleId]) {
+        permissionsMap[roleId] = [];
+      }
+      permissionsMap[roleId].push(row.permission_name);
+    }
+
+    if (!usersRes.error && usersRes.data && usersRes.data.length > 0) {
+      db.users = usersRes.data.map((u: any) => ({
+        ...u,
+        id: Number(u.id),
+        role_id: u.role_id ? Number(u.role_id) : null,
+        is_admin: !!u.is_admin
+      }));
+
+      // Populate db.staff dynamically from users who have a role_id
+      db.staff = db.users
+        .filter(u => u.role_id !== null && u.role_id !== undefined)
+        .map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone || '',
+          role_id: u.role_id!,
+          is_active: u.is_active !== false
+        }));
+    }
     if (!servicesRes.error && servicesRes.data && servicesRes.data.length > 0) {
       db.services = servicesRes.data.map((s: any) => ({
         ...s,
@@ -708,6 +746,7 @@ export async function getDbAsync(): Promise<DbSchema> {
     if (!ordersRes.error && ordersRes.data && ordersRes.data.length > 0) {
       db.orders = ordersRes.data.map((o: any) => ({
         ...o,
+        user_id: o.user_id ? Number(o.user_id) : null,
         property_size: typeof o.property_size === 'string' ? JSON.parse(o.property_size) : o.property_size,
         selected_addons: typeof o.selected_addons === 'string' ? JSON.parse(o.selected_addons) : o.selected_addons,
         accessMethod: o.access_method || o.accessMethod,
@@ -719,9 +758,19 @@ export async function getDbAsync(): Promise<DbSchema> {
       }));
     }
     if (!orderStatusHistoryRes.error && orderStatusHistoryRes.data && orderStatusHistoryRes.data.length > 0) db.orderStatusHistory = orderStatusHistoryRes.data;
-    if (!ticketsRes.error && ticketsRes.data && ticketsRes.data.length > 0) db.tickets = ticketsRes.data;
+    if (!ticketsRes.error && ticketsRes.data && ticketsRes.data.length > 0) {
+      db.tickets = ticketsRes.data.map((t: any) => ({
+        ...t,
+        user_id: t.user_id ? Number(t.user_id) : null
+      }));
+    }
     if (!ticketRepliesRes.error && ticketRepliesRes.data && ticketRepliesRes.data.length > 0) db.ticketReplies = ticketRepliesRes.data;
-    if (!passwordTokensRes.error && passwordTokensRes.data && passwordTokensRes.data.length > 0) db.passwordTokens = passwordTokensRes.data;
+    if (!passwordTokensRes.error && passwordTokensRes.data && passwordTokensRes.data.length > 0) {
+      db.passwordTokens = passwordTokensRes.data.map((pt: any) => ({
+        ...pt,
+        user_id: pt.user_id ? Number(pt.user_id) : null
+      }));
+    }
     if (!enquiriesRes.error && enquiriesRes.data && enquiriesRes.data.length > 0) db.enquiries = enquiriesRes.data;
     if (!emailTemplatesRes.error && emailTemplatesRes.data && emailTemplatesRes.data.length > 0) db.emailTemplates = emailTemplatesRes.data;
     if (!emailLogsRes.error && emailLogsRes.data && emailLogsRes.data.length > 0) {
@@ -737,14 +786,9 @@ export async function getDbAsync(): Promise<DbSchema> {
     if (!rolesRes.error && rolesRes.data && rolesRes.data.length > 0) {
       db.roles = rolesRes.data.map((r: any) => ({
         ...r,
-        permissions: typeof r.permissions === 'string' ? JSON.parse(r.permissions) : (Array.isArray(r.permissions) ? r.permissions : []),
+        id: Number(r.id),
+        permissions: permissionsMap[Number(r.id)] || [],
         is_active: !!r.is_active
-      }));
-    }
-    if (!staffRes.error && staffRes.data && staffRes.data.length > 0) {
-      db.staff = staffRes.data.map((s: any) => ({
-        ...s,
-        is_active: !!s.is_active
       }));
     }
 
@@ -844,23 +888,28 @@ async function pushToMysqlBackground(schema: DbSchema): Promise<void> {
     }));
 
     const mappedRoles = (schema.roles || []).map(r => ({
-      id: r.id,
+      id: Number(r.id),
       name: r.name,
-      permissions: JSON.stringify(r.permissions),
       is_active: r.is_active ? 1 : 0
     }));
 
-    const mappedStaff = (schema.staff || []).map(s => ({
-      id: s.id,
-      name: s.name,
-      email: s.email,
-      phone: s.phone,
-      role_id: s.role_id,
-      is_active: s.is_active ? 1 : 0
+    const mappedUsers = (schema.users || []).map(u => ({
+      id: Number(u.id),
+      name: u.name,
+      email: u.email,
+      phone: u.phone,
+      password_hash: u.password_hash,
+      role_id: u.role_id ? Number(u.role_id) : null,
+      account_source: u.account_source,
+      email_verified_at: u.email_verified_at,
+      is_active: u.is_active !== false ? 1 : 0,
+      is_admin: u.is_admin ? 1 : 0,
+      created_at: u.created_at,
+      updated_at: u.updated_at
     }));
 
     await Promise.all([
-      (mysqlClient.from('app_users') as any).sync(schema.users),
+      (mysqlClient.from('users') as any).sync(mappedUsers),
       (mysqlClient.from('services') as any).sync(mappedServices),
       (mysqlClient.from('addons') as any).sync(schema.addons),
       (mysqlClient.from('pricing_rules') as any).sync(schema.pricingRules),
@@ -875,9 +924,41 @@ async function pushToMysqlBackground(schema: DbSchema): Promise<void> {
       (mysqlClient.from('email_logs') as any).sync(mappedEmailLogs),
       (mysqlClient.from('slots') as any).sync(schema.slots),
       (mysqlClient.from('blocked_dates') as any).sync(mappedBlockedDates),
-      (mysqlClient.from('roles') as any).sync(mappedRoles),
-      (mysqlClient.from('staff') as any).sync(mappedStaff)
+      (mysqlClient.from('roles') as any).sync(mappedRoles)
     ]);
+
+    // Update permissions & role_permissions in pivot table
+    const uniquePermissions = Array.from(
+      new Set((schema.roles || []).flatMap(r => r.permissions || []))
+    );
+
+    const pool = getPool();
+    if (uniquePermissions.length > 0) {
+      const insertPerms = uniquePermissions.map(p => [p]);
+      await pool.query('INSERT IGNORE INTO permissions (name) VALUES ?', [insertPerms]);
+    }
+
+    const [permRows] = await pool.query('SELECT id, name FROM permissions');
+    const permNameToIdMap: Record<string, number> = {};
+    for (const row of (permRows as any[])) {
+      permNameToIdMap[row.name] = row.id;
+    }
+
+    const rpMappings: Array<[number, number]> = [];
+    for (const r of (schema.roles || [])) {
+      const roleId = Number(r.id);
+      for (const pName of (r.permissions || [])) {
+        const pId = permNameToIdMap[pName];
+        if (pId) {
+          rpMappings.push([roleId, pId]);
+        }
+      }
+    }
+
+    await pool.query('DELETE FROM role_permissions');
+    if (rpMappings.length > 0) {
+      await pool.query('INSERT INTO role_permissions (role_id, permission_id) VALUES ?', [rpMappings]);
+    }
   } catch (err) {
     console.error("Could not write updates directly to MySQL tables:", err);
   }

@@ -206,10 +206,12 @@ export class MySQLQueryBuilder {
         } else if (typeof val === 'bigint') {
           copy[key] = Number(val);
         } else if (
-          (this.tableName === 'services' && (key === 'included_items' || key === 'excluded_items')) ||
+          (this.tableName === 'services' && (key === 'included_items' || key === 'excluded_items' || key === 'faqs')) ||
           (this.tableName === 'coupons' && key === 'applicable_services') ||
           (this.tableName === 'orders' && (key === 'property_size' || key === 'selected_addons')) ||
-          (this.tableName === 'roles' && key === 'permissions')
+          (this.tableName === 'roles' && key === 'permissions') ||
+          (this.tableName === 'bookings' && (key === 'pricing' || key === 'addons')) ||
+          (this.tableName === 'cms_content' && key === 'content')
         ) {
           copy[key] = tryJsonParse(val);
         }
@@ -323,20 +325,37 @@ class MySQLClient {
 
   async rpc(fnName: string, args?: any) {
     if (fnName === 'check_db_integrity') {
-      return {
-        data: {
-          tables: [
-            'app_users', 'services', 'addons', 'pricing_rules', 'coupons', 'orders',
-            'order_status_history', 'tickets', 'ticket_replies', 'password_tokens',
-            'enquiries', 'email_templates', 'email_logs', 'slots', 'blocked_dates',
-            'roles', 'staff'
-          ],
-          foreign_keys: []
-        },
-        error: null
-      };
+      try {
+        const pool = getPool();
+        const [tablesRows] = await pool.query('SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()');
+        const tables = (tablesRows as any[]).map(r => r.TABLE_NAME || r.table_name || Object.values(r)[0]);
+        
+        const [fksRows] = await pool.query(`
+          SELECT 
+            CONSTRAINT_NAME AS constraint_name, 
+            TABLE_NAME AS table_name, 
+            REFERENCED_TABLE_NAME AS referenced_table 
+          FROM information_schema.key_column_usage 
+          WHERE table_schema = DATABASE() 
+            AND REFERENCED_TABLE_NAME IS NOT NULL
+        `);
+        
+        return {
+          data: {
+            tables,
+            foreign_keys: (fksRows as any[]).map(r => ({
+              constraint_name: r.CONSTRAINT_NAME || r.constraint_name,
+              table_name: r.TABLE_NAME || r.table_name,
+              referenced_table: r.REFERENCED_TABLE_NAME || r.referenced_table
+            }))
+          },
+          error: null
+        };
+      } catch (err: any) {
+        return { data: null, error: { message: err.message || String(err) } };
+      }
     }
-    return { data: null, error: new Error(`RPC function ${fnName} not supported in mock.`) };
+    return { data: null, error: new Error(`RPC function ${fnName} not supported.`) };
   }
 }
 

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMysql } from '@/lib/mysql';
 import { getDbAsync, saveDb } from '@/lib/db';
+import { authorize } from '@/lib/authMiddleware';
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await authorize(req, 'manage_services');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
     const { id } = await props.params;
     const body = await req.json();
     
@@ -52,6 +57,10 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
   try {
+    const auth = await authorize(req, 'manage_services');
+    if (!auth.authorized) {
+      return auth.response!;
+    }
     const { id } = await props.params;
     const mysqlClient = getMysql();
     if (mysqlClient) {
