@@ -1,0 +1,6 @@
+{
+  "name": "getmeamaid",
+  "description": "Bespoke professional home care or cleaning services under getmeamaid.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

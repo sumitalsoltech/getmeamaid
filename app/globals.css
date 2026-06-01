@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), sans-serif;
+  --font-display: var(--font-display), sans-serif;
+
+  /* Brand Colors from Specification */
+  --color-primary: #002542;
+  --color-secondary: #006a60;
+  --color-accent: #85f6e5;
+  --color-surface: #f6fafe;
+  --color-surface-low: #f0f4f8;
+  --color-surface-lowest: #ffffff;
+  --color-on-surface: #171c1f;
+  --color-on-surface-variant: #43474d;
+  --color-outline-variant: #c3c6ce;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-display);
+}
+
+/* Custom ghost boundaries (15% opacity outline variant) */
+.ghost-border {
+  border-color: rgba(195, 198, 206, 0.15);
+}
+
