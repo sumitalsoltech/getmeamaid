@@ -18,8 +18,13 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
         .select('*, pricing_rule:pricing_rules(*)')
         .eq('service_id', id);
       
-      if (!error) {
-        return NextResponse.json({ success: true, mapping: data });
+      if (!error && data) {
+        const { data: allPricingRules } = await mysqlClient.from('pricing_rules').select('*');
+        const mappingWithRule = data.map((m: any) => ({
+          ...m,
+          pricing_rule: allPricingRules?.find((pr: any) => pr.id === m.pricing_rule_id) || null
+        }));
+        return NextResponse.json({ success: true, mapping: mappingWithRule });
       }
     }
     

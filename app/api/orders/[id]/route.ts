@@ -44,6 +44,18 @@ async function ensureMigrationColumns() {
         `);
         console.log('[Migration] Column staff_job_status added successfully to orders table.');
       }
+
+      // 4. Check bookings table columns for staff_job_status
+      const [bookingsStatusCols]: any = await pool.query(`
+        SHOW COLUMNS FROM \`bookings\` LIKE 'staff_job_status'
+      `);
+      if (Array.isArray(bookingsStatusCols) && bookingsStatusCols.length === 0) {
+        console.log('[Migration] Adding staff_job_status column to bookings table...');
+        await pool.query(`
+          ALTER TABLE \`bookings\` ADD COLUMN \`staff_job_status\` VARCHAR(191) NULL
+        `);
+        console.log('[Migration] Column staff_job_status added successfully to bookings table.');
+      }
     }
   } catch (err) {
     console.error('[Migration] Failed to verify or add columns:', err);

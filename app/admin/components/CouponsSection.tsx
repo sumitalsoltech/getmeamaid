@@ -59,7 +59,7 @@ export default function CouponsSection() {
                 code: newCoupon.code,
                 name: 'Bespoke Promo',
                 discount_type: newCoupon.type,
-                discount_value: newCoupon.value,
+                discount_value: newCoupon.value === '' ? 0 : Number(newCoupon.value),
                 is_active: true
               })
             });
@@ -96,7 +96,7 @@ export default function CouponsSection() {
               type="number"
               placeholder="Amount value"
               value={newCoupon.value}
-              onChange={(e) => setNewCoupon({ ...newCoupon, value: Number(e.target.value) })}
+              onChange={(e) => setNewCoupon({ ...newCoupon, value: e.target.value === '' ? '' : Number(e.target.value) })}
               className="text-xs p-2 bg-neutral-50 border rounded outline-none"
               required
             />

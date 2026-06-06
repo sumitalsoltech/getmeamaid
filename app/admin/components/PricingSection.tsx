@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function PricingSection() {
   const {
+    services,
     selectedPricingService, setSelectedPricingService,
     pricingSubTab, setPricingSubTab,
     pricingSearch, setPricingSearch,
@@ -54,9 +55,11 @@ export default function PricingSection() {
               }}
               className="bg-neutral-50 px-3.5 py-2 text-xs font-semibold rounded-lg border border-neutral-300 focus:outline-none focus:ring-1 focus:ring-[#fbbf24] cursor-pointer text-neutral-900 font-semibold"
             >
-              <option value="Standard Maintenance Curation">Standard Maintenance Curation</option>
-              <option value="Deep Restoration Suite">Deep Restoration Suite</option>
-              <option value="Move In / Out Choreography">Move In / Out Choreography</option>
+              {services.map((service: any) => (
+                <option key={service.id} value={service.title || service.name}>
+                  {service.title || service.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -377,7 +380,7 @@ export default function PricingSection() {
                       required
                       min={1}
                       value={ruleForm.price_adjustment}
-                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                     />
                   </div>
@@ -403,7 +406,7 @@ export default function PricingSection() {
                       required
                       min={1}
                       value={ruleForm.price_adjustment}
-                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                     />
                   </div>
@@ -456,7 +459,7 @@ export default function PricingSection() {
                         required
                         placeholder="e.g. 20"
                         value={ruleForm.price_adjustment}
-                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                         className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                       />
                     </div>
@@ -496,7 +499,7 @@ export default function PricingSection() {
                         type="number"
                         required
                         value={ruleForm.price_adjustment}
-                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                         className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                       />
                     </div>
@@ -578,7 +581,7 @@ export default function PricingSection() {
                       type="number"
                       required
                       value={ruleForm.price_adjustment}
-                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                      onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                       className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                     />
                   </div>
@@ -633,7 +636,7 @@ export default function PricingSection() {
                         type="number"
                         required
                         value={ruleForm.price_adjustment}
-                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: Number(e.target.value) })}
+                        onChange={(e) => setRuleForm({ ...ruleForm, price_adjustment: e.target.value === '' ? '' : Number(e.target.value) })}
                         className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2.5 outline-none focus:ring-1 focus:ring-[#fbbf24] text-xs font-mono font-bold text-neutral-900"
                       />
                     </div>
@@ -738,7 +741,8 @@ export default function PricingSection() {
             </form>
           </div>
 
-          {/* PRICE TEST CALCULATOR / PREVIEW WIDGET */}
+          {/* PRICE TEST CALCULATOR / PREVIEW WIDGET (HIDDEN FOR NOW) */}
+          {/*
           <div className="bg-[#FAF9F6] border border-amber-200/50 rounded-xl p-5 shadow-xs space-y-4 font-sans text-neutral-800">
             <div className="flex items-center gap-2 border-b pb-2 border-amber-200/30 font-sans text-neutral-900">
               <Activity className="w-4 h-4 text-amber-500" />
@@ -759,9 +763,11 @@ export default function PricingSection() {
                     onChange={(e) => setCalcService(e.target.value)}
                     className="w-full bg-white border border-neutral-200 rounded-lg p-1.5 font-semibold cursor-pointer text-neutral-800"
                   >
-                    <option value="Standard Maintenance Curation">Standard Maintenance</option>
-                    <option value="Deep Restoration Suite">Deep Restoration Suite</option>
-                    <option value="Move In / Out Choreography">Move In / Out</option>
+                    {services.map((service: any) => (
+                      <option key={service.id} value={service.title || service.name}>
+                        {service.title || service.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -790,7 +796,7 @@ export default function PricingSection() {
                     type="number"
                     min={1}
                     value={calcBathrooms}
-                    onChange={(e) => setCalcBathrooms(Number(e.target.value))}
+                    onChange={(e) => setCalcBathrooms(e.target.value === '' ? '' : Number(e.target.value))}
                     className="w-full bg-white border border-neutral-200 rounded-lg p-1 text-neutral-800 focus:outline-none"
                   />
                 </div>
@@ -944,6 +950,7 @@ export default function PricingSection() {
               )}
             </div>
           </div>
+          */}
 
         </div>
         

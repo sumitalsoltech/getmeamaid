@@ -383,10 +383,10 @@ interface AdminContextProps {
   setServiceFormFullDesc: (val: string) => void;
   serviceFormImage: string;
   setServiceFormImage: (val: string) => void;
-  serviceFormBasePrice: number;
-  setServiceFormBasePrice: (val: number) => void;
-  serviceFormDisplayOrder: number;
-  setServiceFormDisplayOrder: (val: number) => void;
+  serviceFormBasePrice: number | '';
+  setServiceFormBasePrice: (val: number | '') => void;
+  serviceFormDisplayOrder: number | '';
+  setServiceFormDisplayOrder: (val: number | '') => void;
   serviceFormIsFeatured: boolean;
   setServiceFormIsFeatured: (val: boolean) => void;
   serviceFormIsActive: boolean;
@@ -428,8 +428,8 @@ interface AdminContextProps {
   setCalcService: (val: string) => void;
   calcBedrooms: number;
   setCalcBedrooms: (val: number) => void;
-  calcBathrooms: number;
-  setCalcBathrooms: (val: number) => void;
+  calcBathrooms: number | '';
+  setCalcBathrooms: (val: number | '') => void;
   calcSqFt: string;
   setCalcSqFt: (val: string) => void;
   calcAddons: string[];
@@ -462,8 +462,8 @@ interface AdminContextProps {
   setIsRoleModalOpen: (val: boolean) => void;
   editingRoleId: string | null;
   setEditingRoleId: (val: string | null) => void;
-  newCoupon: { code: string; value: number; type: string };
-  setNewCoupon: React.Dispatch<React.SetStateAction<{ code: string; value: number; type: string }>>;
+  newCoupon: any;
+  setNewCoupon: React.Dispatch<React.SetStateAction<any>>;
   newRule: { name: string; value: number; type: string; rule_type: string };
   setNewRule: React.Dispatch<React.SetStateAction<{ name: string; value: number; type: string; rule_type: string }>>;
 
@@ -592,8 +592,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [serviceFormDesc, setServiceFormDesc] = useState('');
   const [serviceFormFullDesc, setServiceFormFullDesc] = useState('');
   const [serviceFormImage, setServiceFormImage] = useState('');
-  const [serviceFormBasePrice, setServiceFormBasePrice] = useState(140);
-  const [serviceFormDisplayOrder, setServiceFormDisplayOrder] = useState(0);
+  const [serviceFormBasePrice, setServiceFormBasePrice] = useState<number | ''>(140);
+  const [serviceFormDisplayOrder, setServiceFormDisplayOrder] = useState<number | ''>(0);
   const [serviceFormIsFeatured, setServiceFormIsFeatured] = useState(false);
   const [serviceFormIsActive, setServiceFormIsActive] = useState(true);
   const [serviceFormIsInstantPricing, setServiceFormIsInstantPricing] = useState(true);
@@ -604,7 +604,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [serviceFormNotes, setServiceFormNotes] = useState('');
   
   // High fidelity states
-  const [selectedPricingService, setSelectedPricingService] = useState('Standard Maintenance Curation');
+  const [selectedPricingService, setSelectedPricingService] = useState('');
   const [pricingSubTab, setPricingSubTab] = useState('Base Price');
   const [pricingSearch, setPricingSearch] = useState('');
   const [pricingStatusFilter, setPricingStatusFilter] = useState('all');
@@ -612,7 +612,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [pricingSortDir, setPricingSortDir] = useState<'asc' | 'desc'>('asc');
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
 
-  const [ruleForm, setRuleForm] = useState({
+  const [ruleForm, setRuleForm] = useState<any>({
     name: '',
     match_key: '',
     price_adjustment: 0,
@@ -629,10 +629,58 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     message: ''
   });
 
+  // Automatically synchronize selected services state with the fetched database records
+  useEffect(() => {
+    if (services.length > 0) {
+      const exists = services.some(
+        (s: any) => s.title?.toLowerCase() === selectedPricingService.toLowerCase()
+      );
+      if (!exists) {
+        setSelectedPricingService(services[0].title || services[0].name || '');
+      }
+    }
+  }, [services, selectedPricingService]);
+
+  useEffect(() => {
+    if (pricingSubTab === 'Base Price' && selectedPricingService) {
+      const targetService = services.find(
+        (s: any) => s.title?.toLowerCase() === selectedPricingService.toLowerCase() || 
+                    s.slug?.toLowerCase() === selectedPricingService.toLowerCase().replace(/\s+/g, '-')
+      );
+      
+      if (targetService) {
+        setRuleForm((prev: any) => ({
+          ...prev,
+          price_adjustment: targetService.base_price || 0,
+          name: `${targetService.title} Base`,
+          adjustment_type: 'fixed',
+        }));
+      } else {
+        setRuleForm((prev: any) => ({
+          ...prev,
+          price_adjustment: 0,
+          name: `${selectedPricingService} Base`,
+        }));
+      }
+    }
+  }, [pricingSubTab, selectedPricingService, services]);
+
   // Test Pricing Simulator / Calculator States
-  const [calcService, setCalcService] = useState('Standard Maintenance Curation');
+  const [calcService, setCalcService] = useState('');
+
+  // Automatically synchronize calc service state with the fetched database records
+  useEffect(() => {
+    if (services.length > 0) {
+      const exists = services.some(
+        (s: any) => s.title?.toLowerCase() === calcService.toLowerCase()
+      );
+      if (!exists) {
+        setCalcService(services[0].title || services[0].name || '');
+      }
+    }
+  }, [services, calcService]);
   const [calcBedrooms, setCalcBedrooms] = useState(1);
-  const [calcBathrooms, setCalcBathrooms] = useState(1);
+  const [calcBathrooms, setCalcBathrooms] = useState<number | ''>(1);
   const [calcSqFt, setCalcSqFt] = useState('');
   const [calcAddons, setCalcAddons] = useState<string[]>([]);
   const [calcUrgency, setCalcUrgency] = useState('Normal');
@@ -673,7 +721,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [newRole, setNewRole] = useState({ name: '', permissions: [] as string[] });
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
-  const [newCoupon, setNewCoupon] = useState({ code: '', value: 25, type: 'percent' });
+  const [newCoupon, setNewCoupon] = useState<any>({ code: '', value: 25, type: 'percent' });
   const [newRule, setNewRule] = useState({ name: '', value: 15, type: 'fixed', rule_type: 'residence_type' });
 
   const fetchServices = async () => {
@@ -707,9 +755,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       const cmsData = await cmsRes.json();
       if (cmsData.success) {
         setCmsContent(cmsData.cms);
-        if (cmsData.cms.servicesContent) {
-          setServices(cmsData.cms.servicesContent);
-        }
+        // Removed setServices(cmsData.cms.servicesContent) to prevent overwriting 
+        // the actual DB services and causing race conditions on base_price.
       }
 
       const emailRes = await fetch('/api/admin/emails');
@@ -739,12 +786,55 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const handleSavePricingRule = async (ruleType: string, customPayload?: any) => {
     try {
       setPricingRulesLoading(true);
+
+      if (ruleType === 'service_base') {
+        const payload = customPayload || {
+          ...ruleForm,
+          service_name: selectedPricingService
+        };
+        
+        const targetService = services.find(
+          (s: any) => s.title?.toLowerCase() === payload.service_name.toLowerCase() || 
+                      s.slug?.toLowerCase() === payload.service_name.toLowerCase().replace(/\s+/g, '-')
+        );
+        
+        if (targetService && targetService.id) {
+          const res = await fetch(`/api/admin/services/${targetService.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base_price: Number(payload.price_adjustment) })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert('Base price updated successfully in services table.');
+            setServices(prev => prev.map(s => s.id === targetService.id ? { ...s, base_price: Number(payload.price_adjustment) } : s));
+            setRuleForm((prev: any) => ({ ...prev, price_adjustment: Number(payload.price_adjustment) }));
+            setPricingRulesLoading(false);
+            return;
+          } else {
+            alert(`Failed to update base price: ${data.error}`);
+            setPricingRulesLoading(false);
+            return;
+          }
+        } else {
+          alert('Error: Could not find matching service in database to update base price.');
+          setPricingRulesLoading(false);
+          return;
+        }
+      }
+
       let payload = customPayload;
       if (!payload) {
+        const targetService = services.find(
+          (s: any) => s.title?.toLowerCase() === selectedPricingService.toLowerCase() || 
+                      s.slug?.toLowerCase() === selectedPricingService.toLowerCase().replace(/\s+/g, '-')
+        );
         payload = {
           ...ruleForm,
+          price_adjustment: ruleForm.price_adjustment === '' ? 0 : Number(ruleForm.price_adjustment),
           rule_type: ruleType,
-          service_name: selectedPricingService
+          service_name: selectedPricingService,
+          service_id: targetService ? targetService.id : null
         };
         if (editingRuleId) {
           payload.id = editingRuleId;
@@ -825,7 +915,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({
           serviceLevel: calcService,
           bedrooms: calcBedrooms,
-          bathrooms: calcBathrooms,
+          bathrooms: calcBathrooms === '' ? 0 : Number(calcBathrooms),
           squareFootage: calcSqFt ? Number(calcSqFt) : 0,
           addons: calcAddons.map(name => ({ name, quantity: 1 })),
           urgency: calcUrgency,
@@ -1369,7 +1459,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         fetchBookingHistory(booking.id);
       } else {
-        console.error('Failed to sync booking to backend database');
+        const errText = await res.text();
+        console.error('Failed to sync booking to backend database:', errText);
       }
     } catch (e) {
       console.error('Error syncing booking to backend database:', e);

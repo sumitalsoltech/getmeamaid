@@ -97,7 +97,7 @@ export default function Contact() {
               <Phone className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
               <div>
                 <span className="text-[10px] font-bold text-on-surface-variant block uppercase tracking-wider mb-1">CONCIERGE VOICE</span>
-                <span className="text-primary font-bold block">+1 (800) 555-PRISTINE</span>
+                <span className="text-primary font-bold block">+1 (800) 555-GETMEMAID</span>
                 <span className="text-[10px] text-on-surface-variant/70 block mt-1">Available 8:00 AM - 9:00 PM EST Daily</span>
               </div>
             </div>

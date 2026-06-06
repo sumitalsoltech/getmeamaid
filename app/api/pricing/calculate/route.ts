@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resolvePricingRules } from '@/lib/pricingResolver';
+import { getMysql } from '@/lib/mysql';
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,13 +23,42 @@ export async function POST(req: NextRequest) {
 
     // 1. Service Base Price
     let basePrice = 140;
-    const baseRule = rules.find(r => r.rule_type === 'service_base' && r.match_key.toLowerCase() === serviceLevel?.toLowerCase());
-    if (baseRule) {
-      basePrice = baseRule.price_adjustment;
-    } else {
-      // Fallback
-      if (serviceLevel === 'Deep Clean' || serviceLevel === 'Deep Restoration Suite') basePrice = 210;
-      else if (serviceLevel === 'Move In/Out' || serviceLevel === 'Move In / Out Choreography') basePrice = 340;
+    const mysql = getMysql();
+    const { data: dbServices, error: dbError } = await mysql.from('services').select('*');
+    
+    let foundInDb = false;
+    if (!dbError && dbServices && Array.isArray(dbServices)) {
+      let searchKey = serviceLevel?.toLowerCase() || "";
+      if (searchKey === 'deep clean') searchKey = 'deep restoration suite';
+      if (searchKey === 'move in/out' || searchKey === 'move in / out') searchKey = 'move in / out choreography';
+      if (searchKey === 'standard clean' || searchKey === 'standard') searchKey = 'standard maintenance curation';
+
+      const targetService = dbServices.find(
+        (s: any) => {
+          const tLower = s.title?.toLowerCase() || "";
+          const slugLower = s.slug?.toLowerCase() || "";
+          return tLower === searchKey || 
+                 slugLower === searchKey.replace(/\s+/g, '-') ||
+                 (tLower.length > 5 && searchKey.includes(tLower)) || 
+                 (searchKey.length > 5 && tLower.includes(searchKey));
+        }
+      );
+
+      if (targetService && targetService.rate !== undefined) {
+        basePrice = Number(targetService.rate);
+        foundInDb = true;
+      }
+    }
+
+    if (!foundInDb) {
+      const baseRule = rules.find(r => r.rule_type === 'service_base' && r.match_key.toLowerCase() === serviceLevel?.toLowerCase());
+      if (baseRule) {
+        basePrice = baseRule.price_adjustment;
+      } else {
+        // Fallback
+        if (serviceLevel === 'Deep Clean' || serviceLevel === 'Deep Restoration Suite') basePrice = 210;
+        else if (serviceLevel === 'Move In/Out' || serviceLevel === 'Move In / Out Choreography') basePrice = 340;
+      }
     }
 
     // 2. Property / Job Size Charge

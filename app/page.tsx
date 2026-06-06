@@ -869,7 +869,7 @@ export default function Home() {
               The Three-Step Transformation
             </h2>
             <p className="font-sans text-sm text-on-surface-variant">
-              How we take an executive space and restore pristine clarity systematically.
+              How we take an executive space and restore get me a maid clarity systematically.
             </p>
           </div>
 
@@ -1008,7 +1008,7 @@ export default function Home() {
                   &ldquo;A scientific restoration level with a comprehensive layout summary of inclusions.&rdquo;
                 </h4>
                 <p className="font-sans text-xs text-on-surface-variant leading-relaxed">
-                  I booked their deep restoration checkup after painting work.baseboards, vents detailing, and kitchen hood steam treatments look pristine as a medical laboratory. Worth every dollar.
+                  I booked their deep restoration checkup after painting work.baseboards, vents detailing, and kitchen hood steam treatments look get me a maid as a medical laboratory. Worth every dollar.
                 </p>
               </div>
               <div className="pt-4 border-t border-outline-variant/10 flex items-center justify-between">
@@ -1061,7 +1061,7 @@ export default function Home() {
                 Bespoke Cleaning Gift Cards for Architectural Lovers
               </h2>
               <p className="font-sans text-xs sm:text-sm text-on-surface-variant leading-relaxed">
-                Gift the ultimate luxury: a pristine, hand-detailed residence. Perfect for housewarmings, premium wedding alignments, executive colleagues, or new parents in need of an exquisite systematic reset.
+                Gift the ultimate luxury: a get me a maid, hand-detailed residence. Perfect for housewarmings, premium wedding alignments, executive colleagues, or new parents in need of an exquisite systematic reset.
               </p>
               
               {/* Premium Voucher Render Display */}
@@ -1071,7 +1071,7 @@ export default function Home() {
                 
                 <div className="flex justify-between items-start relative z-10">
                   <div>
-                    <span className="font-display text-xs tracking-[0.2em] font-bold text-accent uppercase block">THE PRISTINE</span>
+                    <span className="font-display text-xs tracking-[0.2em] font-bold text-accent uppercase block">GET ME A MAID</span>
                     <span className="font-mono text-[7px] tracking-[0.4em] text-surface-low uppercase">EDITORIAL ATELIER</span>
                   </div>
                   <Sparkles className="w-5 h-5 text-accent animate-pulse" />

@@ -97,7 +97,7 @@ const faqs = [
   },
   {
     q: "Are the custom add-on rates fixed or variable?",
-    a: "Our add-on prices are completely transparent and fixed. You pay the exact flat fee displayed on your booking card, regardless of the duration required to restore the specific appliance or cabinet interiors to pristine standards."
+    a: "Our add-on prices are completely transparent and fixed. You pay the exact flat fee displayed on your booking card, regardless of the duration required to restore the specific appliance or cabinet interiors to Get me a maid standards."
   }
 ];
 
@@ -152,7 +152,7 @@ export default function DeepCleaningService() {
         <div className="absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=1600"
-            alt="Pristine luxury modern kitchen"
+            alt="Get me a maid luxury modern kitchen"
             fill
             className="object-cover brightness-[0.35]"
             referrerPolicy="no-referrer"

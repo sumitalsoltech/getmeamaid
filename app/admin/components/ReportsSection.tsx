@@ -984,9 +984,11 @@ export default function ReportsSection() {
                   className="w-full text-xs p-2 bg-neutral-50 border rounded-lg cursor-pointer outline-none focus:ring-1 focus:ring-[#fbbf24]"
                 >
                   <option value="all">📁 All Services</option>
-                  <option value="Standard Maintenance Curation">Standard Maintenance Curation</option>
-                  <option value="Complete Deep Curation">Complete Deep Curation</option>
-                  <option value="Move In / Out Choreography">Move In / Out Choreography</option>
+                  {services.map((service: any) => (
+                    <option key={service.id} value={service.title || service.name}>
+                      {service.title || service.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

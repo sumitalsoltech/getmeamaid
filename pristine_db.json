@@ -8,11 +8,11 @@
       "password_hash": "$2b$10$uMR2Js.0TDTFDoJgDBmGKOwtJN5uy6apahpgVguo8bF/WfBP2.RCq",
       "role_id": 1,
       "account_source": "signup",
-      "email_verified_at": "2026-05-19T17:09:20.000Z",
+      "email_verified_at": "2026-05-15T14:09:20.000Z",
       "is_active": 1,
       "is_admin": true,
-      "created_at": "2026-05-19T17:09:20.000Z",
-      "updated_at": "2026-05-19T17:09:20.000Z"
+      "created_at": "2026-05-15T14:09:20.000Z",
+      "updated_at": "2026-05-15T14:09:20.000Z"
     },
     {
       "id": 101,
@@ -22,11 +22,11 @@
       "password_hash": "$2b$10$RucF42j3vtCvBuLScfSo7udIlrERaksxwcBG1j.OqN0nr0bzNrZ9u",
       "role_id": 1,
       "account_source": "signup",
-      "email_verified_at": "2026-05-27T23:01:41.000Z",
+      "email_verified_at": "2026-05-23T20:01:41.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-26T02:26:38.000Z",
-      "updated_at": "2026-05-28T06:44:44.000Z"
+      "created_at": "2026-05-21T23:26:38.000Z",
+      "updated_at": "2026-05-24T03:44:44.000Z"
     },
     {
       "id": 102,
@@ -36,11 +36,11 @@
       "password_hash": "$2b$10$wrlNPTFbJgj8yu4haWw7QujVWUcV4VsNUD6.Ty70O.wQLjQF43aAq",
       "role_id": 4,
       "account_source": "signup",
-      "email_verified_at": "2026-05-27T23:01:41.000Z",
+      "email_verified_at": "2026-05-23T20:01:41.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-26T02:26:38.000Z",
-      "updated_at": "2026-05-27T22:03:03.000Z"
+      "created_at": "2026-05-21T23:26:38.000Z",
+      "updated_at": "2026-05-23T19:03:03.000Z"
     },
     {
       "id": 103,
@@ -50,11 +50,11 @@
       "password_hash": "$2b$10$gueOvzLe8oVwBaNPrg3hP.Zfiq2Sfl9d20AUHo6HJQD6h2oiVwVq2",
       "role_id": 2,
       "account_source": "signup",
-      "email_verified_at": "2026-05-27T23:01:41.000Z",
+      "email_verified_at": "2026-05-23T20:01:41.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-26T02:26:38.000Z",
-      "updated_at": "2026-05-27T22:47:03.000Z"
+      "created_at": "2026-05-21T23:26:38.000Z",
+      "updated_at": "2026-05-23T19:47:03.000Z"
     },
     {
       "id": 201,
@@ -64,11 +64,11 @@
       "password_hash": "user123",
       "role_id": null,
       "account_source": "signup",
-      "email_verified_at": "2026-05-19T17:09:20.000Z",
+      "email_verified_at": "2026-05-15T14:09:20.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-19T17:09:20.000Z",
-      "updated_at": "2026-05-19T17:09:20.000Z"
+      "created_at": "2026-05-15T14:09:20.000Z",
+      "updated_at": "2026-05-15T14:09:20.000Z"
     },
     {
       "id": 301,
@@ -78,11 +78,11 @@
       "password_hash": "$2b$10$r7wFCZI1GhOjtffok9wXduonE91gI58yBQJJTKWrrzpeVW7T7y3Fy",
       "role_id": 4,
       "account_source": "signup",
-      "email_verified_at": "2026-05-27T23:01:41.000Z",
+      "email_verified_at": "2026-05-23T20:01:41.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-26T02:39:31.000Z",
-      "updated_at": "2026-05-30T05:27:35.000Z"
+      "created_at": "2026-05-21T23:39:31.000Z",
+      "updated_at": "2026-05-26T02:27:35.000Z"
     },
     {
       "id": 302,
@@ -92,11 +92,11 @@
       "password_hash": "123456",
       "role_id": null,
       "account_source": "signup",
-      "email_verified_at": "2026-05-22T03:38:05.000Z",
+      "email_verified_at": "2026-05-18T00:38:05.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-05-22T03:38:05.000Z",
-      "updated_at": "2026-05-22T03:38:05.000Z"
+      "created_at": "2026-05-18T00:38:05.000Z",
+      "updated_at": "2026-05-18T00:38:05.000Z"
     },
     {
       "id": 461147,
@@ -106,14 +106,67 @@
       "password_hash": "$2b$10$c5GqFzrabVil3CQiWgt6VelqiZlIFF9.yNubFio6DNJXvT4/b7NSW",
       "role_id": 4,
       "account_source": "signup",
-      "email_verified_at": "2026-06-02T00:41:54.000Z",
+      "email_verified_at": "2026-05-28T21:41:54.000Z",
       "is_active": 1,
       "is_admin": false,
-      "created_at": "2026-06-02T00:41:54.000Z",
-      "updated_at": "2026-06-02T00:41:54.000Z"
+      "created_at": "2026-05-28T21:41:54.000Z",
+      "updated_at": "2026-05-28T21:41:54.000Z"
     }
   ],
   "services": [
+    {
+      "id": "srv-493041",
+      "title": "Premium Botanical Disinfection",
+      "slug": "premium-botanical-disinfection",
+      "description": "An organic, plant-based clinical disinfection curation tailored for families and sensitive environments.",
+      "image": "https://images.unsplash.com/photo-1518349619113-03114f06ac3a?auto=format&fit=crop&q=80&w=800",
+      "base_price": 320,
+      "is_active": 1,
+      "is_manual_quote": 0,
+      "included_items": [
+        "Eucalyptus extract misting",
+        "Cabinet interior sanitization"
+      ],
+      "excluded_items": [
+        "Acidic chemical scrubbing",
+        "Exterior gutter clearance"
+      ],
+      "is_featured": 0,
+      "is_instant_pricing_enabled": 1,
+      "display_order": 0,
+      "full_description": "Our botanical disinfection suite utilizes clinical-grade plant extracts to sanitize and refresh your home without residues.",
+      "faqs": [],
+      "notes": "",
+      "created_at": "2026-06-02T22:00:14.000Z",
+      "updated_at": "2026-06-03T04:16:24.000Z"
+    },
+    {
+      "id": "srv-803199",
+      "title": "Elite Culinary & Kitchen Curation",
+      "slug": "elite-culinary-curation",
+      "description": "A premium service focusing on deep kitchen sanitization, prep assistance, and gourmet meal-prep choreography.",
+      "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800",
+      "base_price": 200,
+      "is_active": 1,
+      "is_manual_quote": 0,
+      "included_items": [
+        "Deep kitchen counter sterilizations",
+        "Oven exterior detail wiped",
+        "Ingredient wash and prep staging"
+      ],
+      "excluded_items": [
+        "Cleaning chimney interior ventilation shafts",
+        "Repairing broken kitchen appliances"
+      ],
+      "is_featured": 0,
+      "is_instant_pricing_enabled": 1,
+      "display_order": 0,
+      "full_description": "",
+      "faqs": [],
+      "notes": "",
+      "created_at": "2026-06-03T10:46:02.000Z",
+      "updated_at": "2026-06-03T16:16:27.000Z"
+    },
     {
       "id": "srv-deep",
       "title": "Deep Restoration Suite",
@@ -131,48 +184,8 @@
       "full_description": "",
       "faqs": [],
       "notes": "",
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-31T15:23:07.000Z"
-    },
-    {
-      "id": "srv-move",
-      "title": "Move In / Out Choreography",
-      "slug": "move-in-out",
-      "description": "Designed for...",
-      "image": "https://...",
-      "base_price": 3500,
-      "is_active": 1,
-      "is_manual_quote": 0,
-      "included_items": [],
-      "excluded_items": [],
-      "is_featured": 0,
-      "is_instant_pricing_enabled": 1,
-      "display_order": 0,
-      "full_description": "",
-      "faqs": [],
-      "notes": "",
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
-    },
-    {
-      "id": "srv-standard",
-      "title": "Standard Maintenance Curation",
-      "slug": "standard-maintenance",
-      "description": "A sweeps...",
-      "image": "https://...",
-      "base_price": 1000,
-      "is_active": 1,
-      "is_manual_quote": 0,
-      "included_items": [],
-      "excluded_items": [],
-      "is_featured": 0,
-      "is_instant_pricing_enabled": 1,
-      "display_order": 0,
-      "full_description": "",
-      "faqs": [],
-      "notes": "",
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-06-02T10:28:12.000Z"
     }
   ],
   "addons": [
@@ -183,8 +196,8 @@
       "price": 500,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-05-23T21:11:23.000Z"
     },
     {
       "id": "add-fridge",
@@ -193,8 +206,8 @@
       "price": 300,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-05-23T21:11:23.000Z"
     },
     {
       "id": "add-oven",
@@ -203,8 +216,8 @@
       "price": 350,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-05-23T21:11:23.000Z"
     },
     {
       "id": "add-pethair",
@@ -213,8 +226,8 @@
       "price": 450,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-05-23T21:11:23.000Z"
     },
     {
       "id": "add-windows",
@@ -223,11 +236,95 @@
       "price": 400,
       "pricing_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-23T21:11:23.000Z",
+      "updated_at": "2026-05-23T21:11:23.000Z"
     }
   ],
   "pricingRules": [
+    {
+      "id": "addon_pricing-1780737464337",
+      "service_id": "srv-493041",
+      "rule_type": "addon_pricing",
+      "rule_name": "Greenhouse Sanitization",
+      "value": "Greenhouse",
+      "price_adjustment": 50,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-04T13:17:44.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
+    },
+    {
+      "id": "addon_pricing-1780741889424",
+      "service_id": "srv-803199",
+      "rule_type": "addon_pricing",
+      "rule_name": "Organic Oven/Rack Steaming",
+      "value": "Organic Oven Steaming",
+      "price_adjustment": 45,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-06T10:31:29.000Z",
+      "updated_at": "2026-06-06T05:01:29.000Z"
+    },
+    {
+      "id": "addon_pricing-1780744162990",
+      "service_id": "srv-803199",
+      "rule_type": "addon_pricing",
+      "rule_name": "test 2",
+      "value": "whatever you want",
+      "price_adjustment": 50,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-06T11:09:22.000Z",
+      "updated_at": "2026-06-06T05:39:22.000Z"
+    },
+    {
+      "id": "location_charge-1780737546721",
+      "service_id": "srv-493041",
+      "rule_type": "location_charge",
+      "rule_name": "loc.rule",
+      "value": "M5V",
+      "price_adjustment": 15,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-04T13:19:06.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
+    },
+    {
+      "id": "location_charge-1780741990791",
+      "service_id": "srv-803199",
+      "rule_type": "location_charge",
+      "rule_name": "Location Rule",
+      "value": "743263",
+      "price_adjustment": 15,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-06T10:33:10.000Z",
+      "updated_at": "2026-06-06T05:03:10.000Z"
+    },
+    {
+      "id": "manual_quote-1780737592105",
+      "service_id": "srv-493041",
+      "rule_type": "manual_quote",
+      "rule_name": "Manual Quote Rules.",
+      "value": "large_size",
+      "price_adjustment": 0,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-04T13:19:52.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
+    },
+    {
+      "id": "min_order-1780737560533",
+      "service_id": "srv-493041",
+      "rule_type": "min_order",
+      "rule_name": "Unnamed Rule",
+      "value": "",
+      "price_adjustment": 120,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-04T13:19:20.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
+    },
     {
       "id": "pr-bath",
       "service_id": "",
@@ -237,8 +334,8 @@
       "price_adjustment": 350,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-bed",
@@ -249,44 +346,8 @@
       "price_adjustment": 250,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
-    },
-    {
-      "id": "pr-loc-far",
-      "service_id": "",
-      "rule_type": "location_charge",
-      "rule_name": "Far Boundary Hub",
-      "value": "far",
-      "price_adjustment": 1,
-      "adjustment_type": "percentage",
-      "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
-    },
-    {
-      "id": "pr-loc-normal",
-      "service_id": "",
-      "rule_type": "location_charge",
-      "rule_name": "Normal Service Zone",
-      "value": "normal",
-      "price_adjustment": 0,
-      "adjustment_type": "fixed",
-      "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
-    },
-    {
-      "id": "pr-loc-out",
-      "service_id": "",
-      "rule_type": "location_charge",
-      "rule_name": "Outside Postal Zone",
-      "value": "outside",
-      "price_adjustment": 400,
-      "adjustment_type": "fixed",
-      "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-min-order",
@@ -297,8 +358,8 @@
       "price_adjustment": 999,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-res-condo",
@@ -309,8 +370,8 @@
       "price_adjustment": 0,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-res-house",
@@ -321,8 +382,8 @@
       "price_adjustment": 1000,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-res-office",
@@ -333,8 +394,8 @@
       "price_adjustment": 1500,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
       "id": "pr-res-town",
@@ -345,32 +406,56 @@
       "price_adjustment": 500,
       "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-05-25T06:11:23.000Z",
+      "updated_at": "2026-05-25T06:11:23.000Z"
     },
     {
-      "id": "pr-urg-next",
-      "service_id": "",
-      "rule_type": "urgency_charge",
-      "rule_name": "Next-Day Priority Charge",
-      "value": "next_day",
-      "price_adjustment": 10,
-      "adjustment_type": "percentage",
+      "id": "size_charge-1780737430744",
+      "service_id": "srv-493041",
+      "rule_type": "size_charge",
+      "rule_name": "Botanical 2 Bedroom Addition",
+      "value": "2 Bed",
+      "price_adjustment": 80,
+      "adjustment_type": "fixed",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-06-04T13:17:10.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
     },
     {
-      "id": "pr-urg-same",
-      "service_id": "",
+      "id": "size_charge-1780741802270",
+      "service_id": "srv-803199",
+      "rule_type": "size_charge",
+      "rule_name": "Per Extra Room Addition",
+      "value": "bedrooms",
+      "price_adjustment": 35,
+      "adjustment_type": "fixed",
+      "is_active": 1,
+      "created_at": "2026-06-06T10:30:02.000Z",
+      "updated_at": "2026-06-06T05:00:02.000Z"
+    },
+    {
+      "id": "urgency_charge-1780737491368",
+      "service_id": "srv-493041",
       "rule_type": "urgency_charge",
-      "rule_name": "Same-Day Dispatch Charge",
-      "value": "same_day",
+      "rule_name": "Emergency Dispatch",
+      "value": "Same-day",
       "price_adjustment": 20,
       "adjustment_type": "percentage",
       "is_active": 1,
-      "created_at": "2026-05-28T00:11:23.000Z",
-      "updated_at": "2026-05-28T00:11:23.000Z"
+      "created_at": "2026-06-04T13:18:11.000Z",
+      "updated_at": "2026-06-04T13:55:39.000Z"
+    },
+    {
+      "id": "urgency_charge-1780741934139",
+      "service_id": "srv-803199",
+      "rule_type": "urgency_charge",
+      "rule_name": "Urgency Rule",
+      "value": "Same-day",
+      "price_adjustment": 20,
+      "adjustment_type": "percentage",
+      "is_active": 1,
+      "created_at": "2026-06-06T10:32:14.000Z",
+      "updated_at": "2026-06-06T05:02:14.000Z"
     }
   ],
   "coupons": [
@@ -455,8 +540,8 @@
       "settlement_status": "Scheduled",
       "admin_internal_notes": "Elite client verified. Dispatched primary team lead.",
       "customer_visible_notes": "Your luxury cleaner chef is scheduled. Expect entry exactly at 9:00 AM.",
-      "created_at": "2026-05-19T15:30:20.000Z",
-      "updated_at": "2026-05-19T15:55:00.000Z",
+      "created_at": "2026-05-15T12:30:20.000Z",
+      "updated_at": "2026-05-15T12:55:00.000Z",
       "accessMethod": "Provide lockbox key coordinates",
       "customKeyNotes": "Lockbox is left of the water mains feed pipe, security code is 4920."
     }
@@ -469,7 +554,7 @@
       "new_status": "Under Review",
       "changed_by": "system",
       "note": "Order initialized dynamically. Sent to queue review.",
-      "created_at": "2026-05-19T15:30:20.000Z"
+      "created_at": "2026-05-15T12:30:20.000Z"
     },
     {
       "id": "h-2",
@@ -478,7 +563,7 @@
       "new_status": "Scheduled",
       "changed_by": "admin",
       "note": "Confirmed dates after manual phone verification. Settled queue booking.",
-      "created_at": "2026-05-19T15:55:00.000Z"
+      "created_at": "2026-05-15T12:55:00.000Z"
     }
   ],
   "tickets": [
@@ -492,8 +577,8 @@
       "message": "Hello curator, our condo concierge requires a dedicated lift booking voucher to haul clean extraction steam plates. Is this handled by your chef or should I notify our landlord office?",
       "priority": "Medium",
       "status": "Resolved",
-      "created_at": "2026-05-19T16:00:00.000Z",
-      "updated_at": "2026-05-24T12:14:03.000Z"
+      "created_at": "2026-05-15T13:00:00.000Z",
+      "updated_at": "2026-05-20T09:14:03.000Z"
     }
   ],
   "ticketReplies": [
@@ -504,7 +589,7 @@
       "sender_id": "1",
       "message": "Dear Jean-Paul, our crew lifts all sanitization items as lightweight hand packs. No major freight elevator reservations are necessary! Let us know if you need certificates details.",
       "attachment": "",
-      "created_at": "2026-05-19T16:15:00.000Z"
+      "created_at": "2026-05-15T13:15:00.000Z"
     },
     {
       "id": "rep-541966",
@@ -513,7 +598,7 @@
       "sender_id": "1",
       "message": "hiii \n",
       "attachment": "",
-      "created_at": "2026-05-24T06:44:02.000Z"
+      "created_at": "2026-05-20T03:44:02.000Z"
     }
   ],
   "passwordTokens": [],
@@ -525,7 +610,7 @@
       "phone": "+1 (416) 998-2910",
       "message": "Enquiring about regular weekly office sanitization packages for our bespoke architecture loft in central Queen West.",
       "status": "New",
-      "created_at": "2026-05-19T11:50:00.000Z"
+      "created_at": "2026-05-15T08:50:00.000Z"
     }
   ],
   "emailTemplates": [
@@ -557,7 +642,7 @@
       "to_email": "sumit@gmail.com",
       "subject": "Atelier Restoration Sweep Certified - #PRE-585825",
       "body": "Dear Sumit Dutta,\n\nYour luxury restoration sweep #PRE-585825 is completed. Our team has polished every surface. Please rate your experience in your dashboard or raise ticket if any detail requires supplementary touch.",
-      "sent_at": "2026-05-24T12:16:32.000Z",
+      "sent_at": "2026-05-20T09:16:32.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -572,7 +657,7 @@
       "to_email": "j.leclerc@gmail.com",
       "subject": "[#TKT-590021] Ticket Received - Support Module",
       "body": "Hello Jean-Paul Leclerc,\n\nWe have received your ticket request regarding priority Resolved. Our curators are looking into this details and will message you via dashboard inbox shortly.",
-      "sent_at": "2026-05-24T12:14:03.000Z",
+      "sent_at": "2026-05-20T09:14:03.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -587,7 +672,7 @@
       "to_email": "j.leclerc@gmail.com",
       "subject": "[#TKT-590021] Support Curator Reply Alert",
       "body": "Hello Jean-Paul Leclerc,\n\nAn administrator has posted an update to your ticket #TKT-590021. Read the reply and update comments inside your customer dashboard support logs.",
-      "sent_at": "2026-05-24T06:44:02.000Z",
+      "sent_at": "2026-05-20T03:44:02.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -602,7 +687,7 @@
       "to_email": "sumit@gmail.com",
       "subject": "Payments Verification Certified - Order #PRE-585825 Paid",
       "body": "Dear Sumit Dutta,\n\nThis certifies that payments for Order #PRE-585825 have been audited successfully and marked as PAID.\n\nThank you for choosing luxury, bespoke cleanings.",
-      "sent_at": "2026-05-24T01:11:57.000Z",
+      "sent_at": "2026-05-19T22:11:57.000Z",
       "email_type": null,
       "recipient_email": null,
       "related_entity_id": null,
@@ -636,7 +721,85 @@
     }
   ],
   "blockedDates": [],
-  "servicePricingRules": [],
+  "servicePricingRules": [
+    {
+      "id": "spr-srv-803199-size_charge-1780741075304",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "size_charge-1780741075304",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:17:55.311Z",
+      "updated_at": "2026-06-06T10:17:55.311Z"
+    },
+    {
+      "id": "spr-srv-803199-size_charge-1780741131979",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "size_charge-1780741131979",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:18:51.986Z",
+      "updated_at": "2026-06-06T10:18:51.986Z"
+    },
+    {
+      "id": "spr-srv-803199-size_charge-1780741802270",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "size_charge-1780741802270",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:30:02.276Z",
+      "updated_at": "2026-06-06T10:30:02.276Z"
+    },
+    {
+      "id": "spr-srv-803199-addon_pricing-1780741889424",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "addon_pricing-1780741889424",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:31:29.430Z",
+      "updated_at": "2026-06-06T10:31:29.430Z"
+    },
+    {
+      "id": "spr-srv-803199-urgency_charge-1780741934139",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "urgency_charge-1780741934139",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:32:14.145Z",
+      "updated_at": "2026-06-06T10:32:14.145Z"
+    },
+    {
+      "id": "spr-srv-803199-location_charge-1780741990791",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "location_charge-1780741990791",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T10:33:10.796Z",
+      "updated_at": "2026-06-06T10:33:10.796Z"
+    },
+    {
+      "id": "spr-srv-803199-addon_pricing-1780744162990",
+      "service_id": "srv-803199",
+      "pricing_rule_id": "addon_pricing-1780744162990",
+      "is_required": false,
+      "default_selected": false,
+      "display_order": 0,
+      "is_active": true,
+      "created_at": "2026-06-06T11:09:22.997Z",
+      "updated_at": "2026-06-06T11:09:22.997Z"
+    }
+  ],
   "roles": [
     {
       "id": 1,

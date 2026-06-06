@@ -58,7 +58,7 @@ export default function TorontoLocation() {
       neighborhood: "Forest Hill Residence, Toronto",
       stars: 5,
       title: "Splendid restoration effort",
-      body: "We booked the Deep Restoration suite after hosting an architecture reception. Baseboards, exhaust fans, and interior cabinet alignments were returned to pristine showroom quality. Highly recommended for executive estates."
+      body: "We booked the Deep Restoration suite after hosting an architecture reception. Baseboards, exhaust fans, and interior cabinet alignments were returned to Get me a maid showroom quality. Highly recommended for executive estates."
     },
     {
       name: "Christian & Chloe K.",

@@ -210,7 +210,7 @@ export default function ServicesSection() {
                       type="number"
                       placeholder="140"
                       value={serviceFormBasePrice}
-                      onChange={(e) => setServiceFormBasePrice(Number(e.target.value))}
+                      onChange={(e) => setServiceFormBasePrice(e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-neutral-50 text-xs border rounded-lg focus:outline-none font-mono font-bold text-neutral-900"
                     />
                   </div>
@@ -232,7 +232,7 @@ export default function ServicesSection() {
                     <input
                       type="number"
                       value={serviceFormDisplayOrder}
-                      onChange={(e) => setServiceFormDisplayOrder(Number(e.target.value))}
+                      onChange={(e) => setServiceFormDisplayOrder(e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-neutral-50 text-xs border rounded-lg focus:outline-none font-mono font-bold text-neutral-800"
                     />
                   </div>

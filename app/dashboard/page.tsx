@@ -865,7 +865,7 @@ export default function Dashboard() {
                                   }`}
                                 >
                                   <div className="flex justify-between font-bold text-[10.5px] gap-4">
-                                    <span>{isAdmin ? 'Pristine Curator Concierge' : currentUser?.name}</span>
+                                    <span>{isAdmin ? 'Get me a maid Curator Concierge' : currentUser?.name}</span>
                                     <span className="font-mono text-[9px] text-on-surface-variant/75 font-normal">{new Date(rep.created_at).toLocaleString()}</span>
                                   </div>
                                   <p className="font-sans leading-relaxed">{rep.message}</p>

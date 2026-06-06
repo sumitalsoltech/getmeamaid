@@ -78,6 +78,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Fetch role name to match the /me endpoint
+    let roleName = 'Super Admin';
+    if (roleId) {
+      const { data: roleList } = await mysqlClient.from('roles').select('*').eq('id', roleId);
+      if (roleList && roleList[0]) {
+        roleName = roleList[0].name;
+      } else if (roleId === 4 || String(roleId) === '4') {
+        roleName = 'Field Staff';
+      }
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       {
@@ -86,6 +97,7 @@ export async function POST(req: NextRequest) {
         email: userObj.email,
         type: userType,
         role_id: roleId,
+        role_name: roleName,
         permissions: permissions
       },
       JWT_SECRET,
@@ -101,6 +113,7 @@ export async function POST(req: NextRequest) {
         email: userObj.email,
         type: userType,
         role_id: roleId,
+        role_name: roleName,
         permissions: permissions
       }
     });

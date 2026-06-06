@@ -23,46 +23,33 @@ const bookingSteps = [
   { idx: 10, name: 'Review' }
 ];
 
-// Available add-ons options
-const selectableAddons = [
-  { id: 'fridge', label: 'Inside Refrigerator Detailing', price: 35, desc: 'Clean food layout, extract shelves, wipe organic walls.' },
-  { id: 'oven', label: 'Inside Oven Degrease', price: 35, desc: 'Extract baked carbon scaling with hot continuous mist.' },
-  { id: 'cabinets', label: 'Inside Drawer & Cabinets', price: 45, desc: 'Vacuum particles & micro-sanitize interior walls.' },
-  { id: 'windows', label: 'All Interior Window Panes', price: 40, desc: 'Rail tracks extraction and squeegee polish.' },
-  { id: 'pethair', label: 'Deep Pet Hair Allergen Extract', price: 45, desc: 'Textile mechanical brushing for deep fur dander.' }
-];
 
-const DEFAULT_BOOKING_SUITES = [
-  { title: 'Standard Clean', name: 'Standard Clean', base_price: 140, description: 'routine cleaning maintenance of dust, polished surfaces, vacuum/wipe levels.', is_manual_quote: false },
-  { title: 'Deep Clean', name: 'Deep Clean', base_price: 210, description: 'Detailed lime scales extraction on bathroom tiles and heavy vertical hand scrubs.', is_manual_quote: false },
-  { title: 'Move In/Out', name: 'Move In/Out', base_price: 340, description: 'Vertical empty drawer sanitation, appliance interiors, and complete listing preparation.', is_manual_quote: false },
-];
 
 function BookingWizardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Active step counter (1-indexed)
-  const [currentStep, setCurrentStep] = useState(2); // Start at Step 2 "Home Details" as seen in screenshot!
+  const [currentStep, setCurrentStep] = useState(1);
 
   // --- Step States ---
   // Step 1: Location/Postal
-  const [postal, setPostal] = useState(searchParams.get('postal') || 'M5V 2N8');
-  const [city, setCity] = useState('Toronto Core');
+  const [postal, setPostal] = useState(searchParams.get('postal') || '');
+  const [city, setCity] = useState('');
 
   // Step 2: Tell us about your home
-  const [homeType, setHomeType] = useState(searchParams.get('homeType') || 'Condominium');
-  const [bedrooms, setBedrooms] = useState(parseInt(searchParams.get('beds') || '2'));
-  const [bathrooms, setBathrooms] = useState(parseInt(searchParams.get('baths') || '2'));
-  const [squareFootage, setSquareFootage] = useState(950);
+  const [homeType, setHomeType] = useState(searchParams.get('homeType') || '');
+  const [bedrooms, setBedrooms] = useState(parseInt(searchParams.get('beds') || '1'));
+  const [bathrooms, setBathrooms] = useState(parseInt(searchParams.get('baths') || '1'));
+  const [squareFootage, setSquareFootage] = useState<number | ''>('');
 
   // Step 3: Select restoration level
   const [restorationLevel, setRestorationLevel] = useState(
-    searchParams.get('restorationLevel') || 'Deep Clean'
+    searchParams.get('restorationLevel') || ''
   );
 
   // Step 4: Interval frequency
-  const [frequency, setFrequency] = useState(searchParams.get('frequency') || 'Bi-weekly');
+  const [frequency, setFrequency] = useState(searchParams.get('frequency') || '');
 
   // Step 5: Special Add-ons select list
   const [addons, setAddons] = useState<string[]>(
@@ -70,13 +57,13 @@ function BookingWizardContent() {
   );
 
   // Step 6: Schedule Date & Time Slots
-  const [selectedDate, setSelectedDate] = useState('June 10, 2026');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState('09:00 AM - 01:00 PM (Morning Slot)');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
 
   // Step 7: Notes & custom instructions
-  const [entryMethod, setEntryMethod] = useState('Provide lockbox key coordinates');
-  const [customKeyNotes, setCustomKeyNotes] = useState('Lockbox is left of water mains, code is 4920.');
-  const [customerSpecialNotes, setCustomerSpecialNotes] = useState('Avoid cleaning den home office during business calls.');
+  const [entryMethod, setEntryMethod] = useState('');
+  const [customKeyNotes, setCustomKeyNotes] = useState('');
+  const [customerSpecialNotes, setCustomerSpecialNotes] = useState('');
 
   // Step 8: Customer account details
   const [firstName, setFirstName] = useState('');
@@ -101,6 +88,7 @@ function BookingWizardContent() {
   // --- Live Dynamic Pricing Rules loader and calculator ---
   const [dbRules, setDbRules] = useState<any[]>([]);
   const [availableServices, setAvailableServices] = useState<any[]>([]);
+  const [serviceSpecificRules, setServiceSpecificRules] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/pricing')
@@ -130,73 +118,133 @@ function BookingWizardContent() {
             } else {
               setRestorationLevel(paramLevel);
             }
-          } else {
-            const firstActive = data.services.find((s: any) => s.is_active !== false);
-            if (firstActive) {
-              setRestorationLevel(firstActive.title || firstActive.name);
-            }
           }
         } else {
-          setAvailableServices(DEFAULT_BOOKING_SUITES);
+          setAvailableServices([]);
         }
       } catch (err) {
         console.error('Error loading available services in booking form:', err);
-        setAvailableServices(DEFAULT_BOOKING_SUITES);
+        setAvailableServices([]);
       }
     };
     loadServices();
   }, [searchParams]);
 
-  const currentServiceSelected = (availableServices.length > 0 ? availableServices : DEFAULT_BOOKING_SUITES).find((s: any) => 
-    (s.title || s.name || '').toLowerCase() === restorationLevel.toLowerCase()
-  );
+  const currentServiceSelected = availableServices.find((s: any) => {
+    let searchKey = restorationLevel?.toLowerCase() || "";
+    if (searchKey === 'deep clean') searchKey = 'deep restoration suite';
+    if (searchKey === 'move in/out' || searchKey === 'move in / out') searchKey = 'move in / out choreography';
+    if (searchKey === 'standard clean' || searchKey === 'standard') searchKey = 'standard maintenance curation';
+
+    const tLower = (s.title || s.name || '').toLowerCase();
+    const slugLower = (s.slug || '').toLowerCase();
+    
+    return tLower === searchKey || 
+           slugLower === searchKey.replace(/\s+/g, '-') ||
+           (tLower.length > 5 && searchKey.includes(tLower)) || 
+           (searchKey.length > 5 && tLower.includes(searchKey)) ||
+           tLower === (restorationLevel || '').toLowerCase();
+  });
   const isManualQuoteState = currentServiceSelected?.is_manual_quote === true;
+
+  // Fetch associated pricing rules for the selected service dynamically
+  useEffect(() => {
+    if (currentServiceSelected && currentServiceSelected.id) {
+      fetch(`/api/services/${currentServiceSelected.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.pricing_rules) {
+            setServiceSpecificRules(data.pricing_rules);
+          } else {
+            setServiceSpecificRules([]);
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching service-specific rules:', err);
+          setServiceSpecificRules([]);
+        });
+    } else {
+      setServiceSpecificRules([]);
+    }
+  }, [currentServiceSelected]);
+
+  // Derive selectable add-ons for the selected service.
+  // If no associated add-on rules exist, fallback to default add-ons ONLY for default services.
+  const dynamicSelectableAddons = (() => {
+    const associatedAddons = serviceSpecificRules
+      .filter((sr: any) => {
+        const rule = sr.pricing_rule || sr.pricing_rules;
+        return rule && rule.rule_type === 'addon_pricing' && (sr.is_active !== false && rule.is_active !== false);
+      })
+      .map((sr: any) => {
+        const rule = sr.pricing_rule || sr.pricing_rules;
+        return {
+          id: rule.id,
+          label: rule.name || rule.rule_name,
+          price: Number(rule.price_adjustment) || 0,
+          desc: rule.message || `${rule.name || rule.rule_name} service add-on.`
+        };
+      });
+
+    return associatedAddons;
+  })();
 
   const pricing = (() => {
     // 1. Service levels base price
-    let base = 140; 
+    let base = 0; 
     const currentService = currentServiceSelected;
     if (currentService) {
-      base = Number(currentService.base_price) || 0;
-    } else {
-      let matchKey = restorationLevel === 'Deep Clean' ? 'Deep Clean' : restorationLevel === 'Move In/Out' ? 'Move In/Out' : 'Standard Maintenance Curation';
-      const serviceRule = dbRules.find(r => r.rule_type === 'service_base' && r.match_key.toLowerCase() === matchKey.toLowerCase());
-      if (serviceRule) {
-        base = serviceRule.price_adjustment;
-      } else {
-        if (restorationLevel === 'Deep Clean') base = 210;
-        if (restorationLevel === 'Move In/Out') base = 340;
+      base = Number(currentService.rate) || Number(currentService.base_price) || 0;
+    }
+
+    // Helper to find a rule, preferring service-specific pivot rules
+    const getActiveRule = (ruleType: string, matchKey: string) => {
+      const specific = serviceSpecificRules.find(sr => {
+        const rule = sr.pricing_rule || sr.pricing_rules;
+        return rule && rule.rule_type === ruleType && rule.match_key === matchKey;
+      });
+      if (specific) {
+        return specific.pricing_rule || specific.pricing_rules;
       }
+      return dbRules.find(r => r.rule_type === ruleType && r.match_key === matchKey);
+    };
+
+    if (!restorationLevel) {
+      return {
+        baseService: 0,
+        roomModifiers: 0,
+        addonsTotal: 0,
+        frequencyDiscount: 0,
+        subtotal: 0,
+        serviceFee: 0,
+        tax: 0,
+        total: 0
+      };
     }
 
     // 2. Room Count modifications
     let roomCharge = 0;
-    const bedRule = dbRules.find(r => r.rule_type === 'size_charge' && r.match_key === 'bedrooms');
-    const bathRule = dbRules.find(r => r.rule_type === 'size_charge' && r.match_key === 'bathrooms');
+    const bedRule = getActiveRule('size_charge', 'bedrooms') || dbRules.find(r => r.rule_type === 'size_charge' && r.match_key === 'bedrooms');
+    const bathRule = getActiveRule('size_charge', 'bathrooms') || dbRules.find(r => r.rule_type === 'size_charge' && r.match_key === 'bathrooms');
 
     if (bedrooms > 1) {
-      roomCharge += (bedrooms - 1) * (bedRule ? bedRule.price_adjustment : 20);
+      roomCharge += (bedrooms - 1) * (bedRule ? bedRule.price_adjustment : 0);
     }
     if (bathrooms > 1) {
-      roomCharge += (bathrooms - 1) * (bathRule ? bathRule.price_adjustment : 30);
+      roomCharge += (bathrooms - 1) * (bathRule ? bathRule.price_adjustment : 0);
     }
 
     // 3. Add-on pricing totals
     let addonsCost = 0;
     addons.forEach(addonId => {
-      let matchName = "";
-      if (addonId === 'fridge') matchName = "Deep Refrigerator Hand-wash";
-      else if (addonId === 'oven') matchName = "Deep Oven Curation";
-      else if (addonId === 'windows') matchName = "Interior Window Polishing";
-      else if (addonId === 'cabinets') matchName = "Inside Drawer & Cabinets";
-      else if (addonId === 'pethair') matchName = "Deep Pet Hair Allergen Extract";
-
-      const addRule = dbRules.find(r => r.rule_type === 'addon_pricing' && (r.match_key.toLowerCase() === matchName.toLowerCase() || r.match_key === addonId));
-      if (addRule) {
-        addonsCost += addRule.price_adjustment;
+      const matchedAddon = dynamicSelectableAddons.find(a => a.id === addonId);
+      if (matchedAddon) {
+        addonsCost += matchedAddon.price;
       } else {
-        const selectable = selectableAddons.find(item => item.id === addonId);
-        if (selectable) addonsCost += selectable.price;
+        const addRule = dbRules.find(r => r.rule_type === 'addon_pricing' && (r.id === addonId || r.match_key === addonId));
+        if (addRule) {
+          addonsCost += addRule.price_adjustment;
+        }
       }
     });
 
@@ -212,8 +260,8 @@ function BookingWizardContent() {
     let calculatedSubtotal = totalBeforeDiscount - discountAmount;
 
     // 5. Minimum billing threshold limits
-    const minRule = dbRules.find(r => r.rule_type === 'min_order');
-    let minOrderThreshold = minRule ? minRule.price_adjustment : 120;
+    const minRule = getActiveRule('min_order', 'min_order_value') || dbRules.find(r => r.rule_type === 'min_order');
+    let minOrderThreshold = minRule ? minRule.price_adjustment : 0;
     if (calculatedSubtotal < minOrderThreshold) {
       calculatedSubtotal = minOrderThreshold;
     }
@@ -265,10 +313,21 @@ function BookingWizardContent() {
             homeType,
             bedrooms,
             bathrooms,
-            squareFootage,
+            squareFootage: squareFootage === '' ? 0 : Number(squareFootage),
             restorationLevel,
             frequency,
-            addons,
+            addons: addons.map(addonId => {
+              const matchedAddon = dynamicSelectableAddons.find(a => a.id === addonId);
+              if (matchedAddon) {
+                return { id: matchedAddon.id, name: matchedAddon.label, price: matchedAddon.price };
+              }
+              const addRule = dbRules.find(r => r.rule_type === 'addon_pricing' && (r.id === addonId || r.match_key === addonId));
+              return {
+                id: addonId,
+                name: addRule ? (addRule.name || addRule.rule_name) : addonId,
+                price: addRule ? addRule.price_adjustment : 0
+              };
+            }),
             selectedDate,
             selectedTimeSlot,
             entryMethod,
@@ -334,7 +393,7 @@ function BookingWizardContent() {
           </button>
 
           <div className="flex flex-col items-center">
-            <span className="font-display text-sm tracking-[0.2em] font-bold text-primary">THE PRISTINE</span>
+            <span className="font-display text-sm tracking-[0.2em] font-bold text-primary">GET ME A MAID</span>
             <span className="font-mono text-[8px] tracking-[0.4em] text-on-surface-variant -mt-0.5">EDITORIAL</span>
           </div>
 
@@ -584,10 +643,11 @@ function BookingWizardContent() {
                         <div className="space-y-2">
                           <label className="block text-xs font-semibold text-primary">Bedrooms Quantity</label>
                           <select
-                            value={bedrooms}
+                            value={bedrooms === 0 ? '' : bedrooms}
                             onChange={(e) => setBedrooms(parseInt(e.target.value))}
                             className="w-full px-4 py-3 bg-surface border border-outline-variant/20 rounded-xl focus:outline-none focus:border-secondary text-xs"
                           >
+                            <option value="" disabled>Select Bedrooms</option>
                             {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
                               <option key={count} value={count}>{count} Bedroom{count > 1 ? 's' : ''}</option>
                             ))}
@@ -597,10 +657,11 @@ function BookingWizardContent() {
                         <div className="space-y-2">
                           <label className="block text-xs font-semibold text-primary">Bathrooms Quantity</label>
                           <select
-                            value={bathrooms}
+                            value={bathrooms === 0 ? '' : bathrooms}
                             onChange={(e) => setBathrooms(parseInt(e.target.value))}
                             className="w-full px-4 py-3 bg-surface border border-outline-variant/20 rounded-xl focus:outline-none focus:border-secondary text-xs"
                           >
+                            <option value="" disabled>Select Bathrooms</option>
                             {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6].map((count) => (
                               <option key={count} value={count}>{count} Bathroom{count > 1 ? 's' : ''}</option>
                             ))}
@@ -615,7 +676,7 @@ function BookingWizardContent() {
                           <input
                             type="number"
                             value={squareFootage}
-                            onChange={(e) => setSquareFootage(parseInt(e.target.value) || 0)}
+                            onChange={(e) => setSquareFootage(e.target.value === '' ? '' : parseInt(e.target.value))}
                             className="w-full px-4 py-3 bg-surface border border-outline-variant/20 rounded-xl focus:outline-none text-xs font-mono"
                             placeholder="e.g., 1200"
                           />
@@ -633,7 +694,7 @@ function BookingWizardContent() {
                       <p className="font-sans text-xs text-on-surface-variant">Select Your Restoration Level: Choose standard routine curation, intense multi-hour scaling extraction, or thorough empty-home vertical sweeping.</p>
                       
                       <div className="grid grid-cols-1 gap-4">
-                        {(availableServices.length > 0 ? availableServices : DEFAULT_BOOKING_SUITES).map((suite) => {
+                        {availableServices.map((suite) => {
                           const sTitle = suite.title || suite.name;
                           const isManual = suite.is_manual_quote === true;
                           const sPriceText = isManual ? 'Manual Quote Required' : `$${suite.base_price || 140}`;
@@ -701,7 +762,7 @@ function BookingWizardContent() {
                       <p className="font-sans text-xs text-on-surface-variant">Customize cleaning inclusions recursively. Toggle checkboxes to authorize specific restoration tasks dynamically.</p>
                       
                       <div className="space-y-3">
-                        {selectableAddons.map((addon) => {
+                        {dynamicSelectableAddons.map((addon) => {
                           const isChecked = addons.includes(addon.id);
                           return (
                             <div
@@ -1026,21 +1087,25 @@ function BookingWizardContent() {
                 <div className="bg-surface-lowest p-6 rounded-2xl border border-outline-variant/15 shadow-sm space-y-5 sticky top-28">
                   <div className="border-b border-outline-variant/10 pb-3 flex justify-between items-center bg-transparent">
                     <span className="font-display text-xs tracking-widest uppercase font-bold text-primary">Booking Summary</span>
-                    <span className="font-mono text-[9px] text-on-surface-variant/60">PRISTINE ESTIMATION</span>
+                    <span className="font-mono text-[9px] text-on-surface-variant/60">GET ME A MAID ESTIMATION</span>
                   </div>
 
                   {/* Summary list */}
                   <div className="space-y-3 text-xs text-on-surface-variant">
                     
-                    <div className="flex justify-between">
-                      <span className="font-sans inline-flex items-center gap-1.5 font-medium text-on-surface-variant">Residential Suite Choice</span>
-                      <span className="font-mono text-[11px] font-bold text-primary">{restorationLevel}</span>
-                    </div>
+                    {restorationLevel && (
+                      <div className="flex justify-between">
+                        <span className="font-sans inline-flex items-center gap-1.5 font-medium text-on-surface-variant">Residential Suite Choice</span>
+                        <span className="font-mono text-[11px] font-bold text-primary">{restorationLevel}</span>
+                      </div>
+                    )}
 
-                    <div className="flex justify-between">
-                      <span className="font-sans font-medium text-on-surface-variant">Dimensions Details</span>
-                      <span className="font-mono text-[11px] text-primary">{bedrooms} Bedrooms, {bathrooms} Bathrooms</span>
-                    </div>
+                    {(bedrooms > 0 || bathrooms > 0) && (
+                      <div className="flex justify-between">
+                        <span className="font-sans font-medium text-on-surface-variant">Dimensions Details</span>
+                        <span className="font-mono text-[11px] text-primary">{bedrooms || 0} Bedrooms, {bathrooms || 0} Bathrooms</span>
+                      </div>
+                    )}
 
                     <div className="flex justify-between">
                       <span className="font-sans font-medium text-on-surface-variant">Frequency Schedule</span>
@@ -1050,7 +1115,7 @@ function BookingWizardContent() {
                     {addons.length > 0 && (
                       <div className="pt-2 border-t border-outline-variant/10 space-y-1">
                         <span className="block text-[9px] font-mono tracking-widest font-bold text-on-surface-variant/60 uppercase">DURABLE INCLUSIONS ADDITIONS:</span>
-                        {selectableAddons.filter(item => addons.includes(item.id)).map(item => (
+                        {dynamicSelectableAddons.filter(item => addons.includes(item.id)).map(item => (
                           <div key={item.id} className="flex justify-between text-[11px] font-sans">
                             <span className="text-on-surface-variant/85 inline-flex items-center gap-1">
                               <Plus className="w-3 h-3 text-secondary" />

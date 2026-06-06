@@ -161,7 +161,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <div className="p-3 bg-[#fbbf24]/10 rounded-full text-[#fbbf24] mb-2">
               <Shield className="w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight uppercase tracking-widest font-mono text-white">pristine admin</h1>
+            <h1 className="text-2xl font-bold tracking-tight uppercase tracking-widest font-mono text-white">get me a maid admin</h1>
             <p className="text-xs text-neutral-400">Enterprise Operations Control Console</p>
           </div>
 
@@ -227,9 +227,9 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="p-5 border-b border-neutral-800 flex flex-col gap-1 bg-[#161b22]">
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-[#fbbf24]" />
-              <span className="font-bold tracking-wider uppercase font-mono text-white text-xs">pristine ops</span>
+              <span className="font-bold tracking-wider uppercase font-mono text-white text-xs">get me a maid ops</span>
             </div>
-            <span className="text-[10px] text-[#fbbf24] uppercase tracking-widest font-bold">Atelier Suite v4.1</span>
+    
           </div>
 
           <div className="px-4 py-2 border-b border-neutral-800/40 text-[10px] text-neutral-500 font-mono select-none uppercase tracking-wider">
@@ -248,13 +248,13 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               { name: 'Pricing Rules', icon: DollarSign },
               { name: 'Coupons', icon: Tag },
               { name: 'Slots / Availability', icon: Clock },
-              { name: 'Tickets', icon: MessageSquare },
+              // { name: 'Tickets', icon: MessageSquare },
               { name: 'Invoices', icon: FileSpreadsheet },
-              { name: 'Reports', icon: BarChart3 },
+              // { name: 'Reports', icon: BarChart3 },
               { name: 'Email Templates', icon: Mail },
               { name: 'Content Management', icon: Inbox },
               { name: 'Settings', icon: Settings },
-              { name: 'Database Health', icon: Database }
+              // { name: 'Database Health', icon: Database }
             ].map((m) => {
               const visible = hasPermission(m.name);
               if (!visible) return null;
@@ -322,7 +322,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
               <h2 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-1.5 font-mono">
                 <span>{activeTab}</span>
               </h2>
-              <p className="text-xs text-neutral-500">PRISTINE System Panel Management Drawer</p>
+              <p className="text-xs text-neutral-500">Get me a maid System Panel Management Drawer</p>
             </div>
             <div className="flex items-center gap-3">
               {currentUser && (
