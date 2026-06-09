@@ -89,6 +89,7 @@ function BookingWizardContent() {
   const [dbRules, setDbRules] = useState<any[]>([]);
   const [availableServices, setAvailableServices] = useState<any[]>([]);
   const [serviceSpecificRules, setServiceSpecificRules] = useState<any[]>([]);
+  const [dbAddons, setDbAddons] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/pricing')
@@ -99,6 +100,15 @@ function BookingWizardContent() {
         }
       })
       .catch(err => console.error('Error fetching db rules:', err));
+
+    fetch('/api/addons')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.addons) {
+          setDbAddons(data.addons.filter((a: any) => a.is_active !== false));
+        }
+      })
+      .catch(err => console.error('Error fetching db addons:', err));
 
     const loadServices = async () => {
       try {
@@ -169,24 +179,18 @@ function BookingWizardContent() {
   }, [currentServiceSelected]);
 
   // Derive selectable add-ons for the selected service.
-  // If no associated add-on rules exist, fallback to default add-ons ONLY for default services.
   const dynamicSelectableAddons = (() => {
-    const associatedAddons = serviceSpecificRules
-      .filter((sr: any) => {
-        const rule = sr.pricing_rule || sr.pricing_rules;
-        return rule && rule.rule_type === 'addon_pricing' && (sr.is_active !== false && rule.is_active !== false);
+    return dbAddons
+      .filter((addon: any) => {
+        const matchesService = !addon.service_id || addon.service_id === "" || (currentServiceSelected && addon.service_id === currentServiceSelected.id);
+        return addon.is_active !== false && matchesService;
       })
-      .map((sr: any) => {
-        const rule = sr.pricing_rule || sr.pricing_rules;
-        return {
-          id: rule.id,
-          label: rule.name || rule.rule_name,
-          price: Number(rule.price_adjustment) || 0,
-          desc: rule.message || `${rule.name || rule.rule_name} service add-on.`
-        };
-      });
-
-    return associatedAddons;
+      .map((addon: any) => ({
+        id: addon.id,
+        label: addon.name,
+        price: Number(addon.price) || 0,
+        desc: addon.description || `${addon.name} service add-on.`
+      }));
   })();
 
   const pricing = (() => {
